@@ -546,6 +546,183 @@ function addToReview(q) {
   }
 }
 
+function removeFromReview(id) {
+  const before = reviewPool.length;
+  reviewPool = reviewPool.filter(x => String(x.id) !== String(id));
+  if(reviewPool.length !== before) saveReviewPool();
+}
+
+// 管理モード関連関数
+function showManagement() {
+  renderReviewList();
+  buildItemSelector();
+  renderItemQuestions();
+  showScreen('managementScreen');
+}
+
+function renderReviewList() {
+  const box = document.getElementById('reviewListBox');
+  loadReviewPool();
+  if(!reviewPool.length) {
+    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（復習リストは空です）</div>';
+    return;
+  }
+  const rows = reviewPool.map(q => {
+    const title = q.title ? `<div style="font-size:12px;color:#718096">${escapeHTML(q.title)}</div>` : '';
+    return `<div class="item-row">
+      <div style="font-weight:700">${escapeHTML(q.id)}. ${escapeHTML(q.question || '')}</div>
+      ${title}
+      <div class="inline-controls">
+        <button onclick="removeFromReviewAndRefresh('${q.id}')" class="inline-btn">復習から削除</button>
+        <button onclick="previewQA('${q.id}')" class="inline-btn">内容を見る</button>
+      </div>
+    </div>`;
+  }).join('');
+  box.innerHTML = rows;
+}
+
+function removeFromReviewAndRefresh(id) {
+  removeFromReview(id);
+  renderReviewList();
+}
+
+function previewQA(id) {
+  const q = reviewPool.find(x => String(x.id) === String(id)) || 
+             questionData.find(x => String(x.id) === String(id));
+  if(!q) {
+    alert('データが見つかりません。');
+    return;
+  }
+  const msg = `【${q.point || ''}】${q.title || ''}\n\n問題: ${q.question || ''}\n\n選択肢: ${(q.choices || []).join(' / ')}\n\nヒント: ${q.hint || '(なし)'}\n\n正解: ${q.answer || ''}`;
+  alert(msg);
+}
+
+function clearReviewAll() {
+  if(!confirm('復習リストをすべて削除します。よろしいですか？')) return;
+  reviewPool = [];
+  saveReviewPool();
+  renderReviewList();
+}
+
+function exportReviewList() {
+  loadReviewPool();
+  const blob = new Blob([JSON.stringify(reviewPool, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'review_list.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function importReviewList() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json';
+  inp.onchange = (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if(Array.isArray(data)) {
+          reviewPool = data;
+          saveReviewPool();
+          renderReviewList();
+          alert('読み込みました。');
+        } else {
+          alert('形式が正しくありません。');
+        }
+      } catch(_) {
+        alert('読み込みに失敗しました。');
+      }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// 項目別問題一覧
+function buildItemSelector() {
+  const sel = document.getElementById('itemSelector');
+  if(!sel) return;
+  const map = new Map();
+  
+  questionData.forEach(q => {
+    const id = String(q.subId || '').padStart(3, '0');
+    const name = q.title || id;
+    if(!map.has(id)) map.set(id, name);
+  });
+  
+  if(map.size === 0) {
+    Object.values(grammarData).forEach(cat => {
+      (cat.items || []).forEach(it => {
+        map.set(it.id, it.name);
+      });
+    });
+  }
+  
+  sel.innerHTML = '<option value="">（小項目を選択）</option>';
+  const arr = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  arr.forEach(([id, name]) => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = `${id}. ${name}`;
+    sel.appendChild(opt);
+  });
+}
+
+function renderItemQuestions() {
+  const sel = document.getElementById('itemSelector');
+  const box = document.getElementById('itemQuestionsBox');
+  const info = document.getElementById('itemInfo');
+  if(!sel || !box) return;
+  
+  const id = sel.value;
+  if(!id) {
+    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（小項目を選択してください）</div>';
+    info.textContent = '';
+    return;
+  }
+  
+  const list = questionData.filter(q => String(q.subId).padStart(3, '0') === String(id).padStart(3, '0'));
+  info.textContent = `この小項目の問題数: ${list.length} 件`;
+  
+  if(list.length === 0) {
+    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（この項目の問題はCSVに見つかりませんでした）</div>';
+    return;
+  }
+  
+  box.innerHTML = list.map(q => {
+    const ch = (q.choices || []).length ? 
+      `<div class="small">選択肢: <span class="code">${escapeHTML(q.choices.join(' / '))}</span></div>` : '';
+    return `<div class="item-row">
+      <div><span class="code">${escapeHTML(q.id)}</span> <strong>${escapeHTML(q.question || '')}</strong> <span class="badge">${escapeHTML(q.point || '')}</span></div>
+      <div class="small">正解: <span class="code">${escapeHTML(q.answer || '')}</span></div>
+      ${ch}
+      <div class="inline-controls">
+        <button class="inline-btn" onclick="addToReviewById('${q.id}')">復習に追加</button>
+        <button class="inline-btn" onclick="removeFromReviewAndRefresh('${q.id}')">復習から削除</button>
+        <button class="inline-btn" onclick="previewQA('${q.id}')">内容を見る</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addToReviewById(id) {
+  const q = questionData.find(x => String(x.id) === String(id));
+  if(!q) {
+    alert('問題が見つかりません。');
+    return;
+  }
+  addToReview(q);
+  renderReviewList();
+  alert('復習リストに追加しました。');
+}
+
 // カテゴリUI
 function buildCategoryUI() {
   const major = document.getElementById('majorGroup');
@@ -910,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   
   document.getElementById('btnManagement').addEventListener('click', () => {
-    showScreen('managementScreen');
+    showManagement();
   });
   
   // 設定画面
@@ -978,6 +1155,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // 管理画面
   document.getElementById('btnHomeFromMgmt').addEventListener('click', backToHome);
+  
+  // 管理モード機能
+  document.getElementById('btnExportReview').addEventListener('click', exportReviewList);
+  document.getElementById('btnImportReview').addEventListener('click', importReviewList);
+  document.getElementById('btnClearReview').addEventListener('click', clearReviewAll);
+  document.getElementById('itemSelector').addEventListener('change', renderItemQuestions);
   
   // FABボタン
   document.getElementById('homeFab').addEventListener('click', () => {
