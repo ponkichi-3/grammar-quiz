@@ -59,6 +59,10 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 .hint-label{font-size:12px;color:#c05621;font-weight:700;margin-bottom:4px}
 .hint-text{color:#7b341e;font-size:15px;line-height:1.5}
 .hint-btn{display:inline-block;padding:8px 12px;border:2px solid #ed8936;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;font-weight:700;color:#c05621;margin-top:10px}
+.explanation-box{margin-top:10px;padding:12px;background:#f0f8ff;border:2px solid #4a90e2;border-radius:8px;display:none}
+.explanation-label{font-size:12px;color:#2c5282;font-weight:700;margin-bottom:4px}
+.explanation-text{color:#1a365d;font-size:15px;line-height:1.5}
+.explanation-btn{display:inline-block;padding:8px 12px;border:2px solid #4a90e2;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;font-weight:700;color:#2c5282;margin-top:10px}
 .result-details{background:#f7fafc;border-radius:12px;padding:16px;margin:14px 0}
 .result-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0}
 .result-item:last-child{border-bottom:none}
@@ -94,7 +98,7 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
     <button class="button button-orange" id="btnPracticeMode">練習モード</button>
     <button class="button button-green" id="btnReviewMode">復習モード</button>
     <button class="button button-blue" id="btnManagement">管理モード</button>
-    <div class="small">CSVは同フォルダの <code id="csvNameNote">grammar_mcq.csv</code> を自動読込します。</div>
+    <div class="small">CSVは同フォルダの <code id="csvNameNote">grammar_mcq.csv</code> を自動読込します。列: id,question,choice1-4,answer,point,title,hint,explanation</div>
   </div>
 
   <div id="settingsScreen" class="hidden">
@@ -136,11 +140,18 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 
     <div class="form-group">
       <label>問題数</label>
-      <select id="questionCount">
-        <option value="5">5問</option>
-        <option value="10" selected>10問</option>
-        <option value="all">全問題</option>
-      </select>
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="questionCount" style="flex:1">
+          <option value="5">5問</option>
+          <option value="10" selected>10問</option>
+          <option value="15">15問</option>
+          <option value="20">20問</option>
+          <option value="30">30問</option>
+          <option value="all">全問題</option>
+          <option value="custom">カスタム</option>
+        </select>
+        <input type="number" id="customCount" min="1" max="999" placeholder="問題数" style="width:100px;display:none">
+      </div>
     </div>
 
     <div class="form-group" id="timeLimitGroup">
@@ -189,6 +200,12 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
         <div id="modelAnswer" class="model-answer">
           <div class="model-answer-label">正解</div>
           <div id="modelAnswerText" class="model-answer-text"></div>
+        </div>
+        
+        <button id="explanationButton" class="explanation-btn" type="button" style="display:none">解説を見る</button>
+        <div id="explanationBox" class="explanation-box">
+          <div class="explanation-label">解説</div>
+          <div id="explanationText" class="explanation-text"></div>
         </div>
       </div>
 
@@ -257,7 +274,7 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 
 <script>
 // データとグローバル変数
-const DEFAULT_CSVS = ['grammar_mcq.csv', 'grammar_definition_with_examples2.csv', 'grammar_definition.csv'];
+const DEFAULT_CSVS = ['grammar_mcq.csv.csv', 'grammar_mcq.csv', 'grammar_definition_with_examples2.csv', 'grammar_definition.csv'];
 let questionData=[];
 let currentQuestions=[];
 let currentQuestion=0;
@@ -464,6 +481,7 @@ function rowsToQuestions(rows) {
   const pI = idx('point');
   const tI = idx('title');
   const hI = idx('hint') >= 0 ? idx('hint') : idx('hints');
+  const eI = idx('explanation');
   const c1I = idx('choice1');
   const c2I = idx('choice2');
   const c3I = idx('choice3');
@@ -496,7 +514,8 @@ function rowsToQuestions(rows) {
       point: pointRaw.trim(),
       title: get(tI).toString().trim(),
       subId: subId,
-      hint: get(hI).toString().trim()
+      hint: get(hI).toString().trim(),
+      explanation: get(eI).toString().trim()
     });
   }
   return out;
@@ -622,8 +641,28 @@ function startTest() {
   const order = document.getElementById('questionOrder').value;
   if(order === 'shuffle') filtered = shuffle(filtered);
   
-  const count = document.getElementById('questionCount').value;
-  if(count !== 'all') filtered = filtered.slice(0, parseInt(count, 10));
+  const countSelect = document.getElementById('questionCount').value;
+  let count;
+  
+  if(countSelect === 'custom') {
+    const customValue = document.getElementById('customCount').value;
+    if(!customValue || customValue < 1) {
+      alert('問題数を入力してください（1以上）');
+      return;
+    }
+    count = parseInt(customValue, 10);
+  } else if(countSelect !== 'all') {
+    count = parseInt(countSelect, 10);
+  }
+  
+  if(count) {
+    if(count > filtered.length) {
+      if(!confirm(`選択した項目の問題数は${filtered.length}問です。${filtered.length}問で開始しますか？`)) {
+        return;
+      }
+    }
+    filtered = filtered.slice(0, count);
+  }
   
   currentQuestions = filtered.map(q => ({...q}));
   currentQuestion = 0;
@@ -704,6 +743,12 @@ function renderQuestion() {
     hintBtn.style.display = 'none';
   }
   hintBox.style.display = 'none';
+  
+  // 解説
+  const explBtn = document.getElementById('explanationButton');
+  const explBox = document.getElementById('explanationBox');
+  explBtn.style.display = 'none';
+  explBox.style.display = 'none';
 }
 
 function inferChoicesFromAnswer(q) {
@@ -739,6 +784,16 @@ function confirmAnswer() {
   
   document.getElementById('modelAnswerText').textContent = q.answer || '';
   document.getElementById('modelAnswer').style.display = 'block';
+  
+  // 解説ボタンを表示（解説がある場合のみ）
+  const explBtn = document.getElementById('explanationButton');
+  if(q.explanation && q.explanation.trim()) {
+    explBtn.style.display = 'inline-block';
+    document.getElementById('explanationText').innerHTML = q.explanation.split('|').join('<br>');
+  } else {
+    explBtn.style.display = 'none';
+  }
+  
   document.getElementById('rateArea').classList.remove('hidden');
   document.getElementById('confirmButton').disabled = true;
   document.getElementById('nextButton').classList.remove('hidden');
@@ -861,6 +916,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 設定画面
   document.getElementById('modeTest').addEventListener('click', () => selectMode('test'));
   document.getElementById('modePractice').addEventListener('click', () => selectMode('practice'));
+  
+  // 問題数選択のイベント
+  document.getElementById('questionCount').addEventListener('change', (e) => {
+    const customInput = document.getElementById('customCount');
+    if(e.target.value === 'custom') {
+      customInput.style.display = 'block';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+    }
+  });
+  
   document.getElementById('btnSelectAllMajor').addEventListener('click', () => {
     document.querySelectorAll('#majorGroup input[type=checkbox]').forEach(cb => cb.checked = true);
     updateSubCategories();
@@ -879,6 +946,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const box = document.getElementById('hintBox');
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
   });
+  
+  document.getElementById('explanationButton').addEventListener('click', () => {
+    const box = document.getElementById('explanationBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+  
   document.getElementById('confirmButton').addEventListener('click', confirmAnswer);
   document.getElementById('btnPerfect').addEventListener('click', () => rateCurrent('perfect'));
   document.getElementById('btnSome').addEventListener('click', () => rateCurrent('some'));
