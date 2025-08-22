@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>文法記述テスト（確認式＋復習 / 管理モード対応 FIX9）</title>
+<title>文法4択テスト（確認式＋復習 / 管理モード対応 MCQ版）</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Hiragino Sans',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;overflow-x:hidden}
@@ -40,6 +40,10 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 .point-badge{background:#667eea;color:#fff;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
 .question-title{font-size:13px;color:#4a5568;margin-bottom:6px;font-weight:600}
 .question-text{font-size:20px;font-weight:700;color:#2d3748;line-height:1.5}
+.choice{border:2px solid #e2e8f0;border-radius:10px;padding:10px;margin-top:10px;background:#fff;display:flex;gap:8px;align-items:flex-start}
+.choice.correct{border-color:#48bb78;background:#f0fff4}
+.choice.incorrect{border-color:#f56565;background:#fff5f5}
+.choice input{margin-top:3px}
 .model-answer{margin-top:10px;padding:12px;background:#e6fffa;border:2px solid #38b2ac;border-radius:8px;display:none}
 .model-answer-label{font-size:12px;color:#2c7a7b;font-weight:700;margin-bottom:4px}
 .model-answer-text{color:#234e52;font-size:15px;line-height:1.5}
@@ -51,33 +55,22 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 .rate-btn.selected{background:#f0f4ff;border-color:#667eea}
 .rate-note{font-size:12px;color:#718096;text-align:center;margin-top:4px}
 #rateFeedback{font-size:12px;color:#2c5282;text-align:center;margin-top:6px;display:none}
-.example-box{margin-top:10px;padding:12px;border:1px solid #e2e8f0;border-radius:8px;background:#f9fafb}
-.example-dim{color:#718096}
 .hint-box{margin-top:10px;padding:12px;background:#fff7ed;border:2px solid #ed8936;border-radius:8px;display:none}
 .hint-label{font-size:12px;color:#c05621;font-weight:700;margin-bottom:4px}
 .hint-text{color:#7b341e;font-size:15px;line-height:1.5}
 .hint-btn{display:inline-block;padding:8px 12px;border:2px solid #ed8936;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;font-weight:700;color:#c05621;margin-top:10px}
+.explanation-box{margin-top:10px;padding:12px;background:#f0f8ff;border:2px solid #4a90e2;border-radius:8px;display:none}
+.explanation-label{font-size:12px;color:#2c5282;font-weight:700;margin-bottom:4px}
+.explanation-text{color:#1a365d;font-size:15px;line-height:1.5}
+.explanation-btn{display:inline-block;padding:8px 12px;border:2px solid #4a90e2;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;font-weight:700;color:#2c5282;margin-top:10px}
 .result-details{background:#f7fafc;border-radius:12px;padding:16px;margin:14px 0}
 .result-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0}
 .result-item:last-child{border-bottom:none}
 .score-display{font-size:56px;font-weight:800;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:10px 0;text-align:center}
 .small{font-size:12px;color:#718096;text-align:center;margin-top:6px}
-@media (max-width:480px){.rate-grid{grid-template-columns:1fr} .question-text{font-size:18px} .score-display{font-size:48px}}
-#err{display:none;margin-bottom:10px;padding:10px;border-radius:8px;background:#FED7D7;color:#822727;font-weight:700}
-
-/* Persistent home FAB */
-.home-fab{
-  position:fixed; right:16px; bottom:16px; z-index:1000;
-  display:flex; align-items:center; gap:8px;
-  border:none; border-radius:999px; padding:10px 14px;
-  font-weight:800; font-size:14px; cursor:pointer;
-  background:linear-gradient(135deg,#805ad5 0%, #4c51bf 100%); color:#fff;
-  box-shadow:0 10px 25px rgba(0,0,0,.2);
-}
-.home-fab:active{ transform:translateY(1px); }
-.home-fab .icon{ font-size:18px; line-height:1; }
-
-/* 管理モードのレイアウト */
+.home-fab{position:fixed;right:16px;bottom:16px;z-index:1000;display:flex;align-items:center;gap:8px;border:none;border-radius:999px;padding:10px 14px;font-weight:800;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#805ad5 0%, #4c51bf 100%);color:#fff;box-shadow:0 10px 25px rgba(0,0,0,.2)}
+.home-fab:active{transform:translateY(1px)}
+.home-fab .icon{font-size:18px;line-height:1}
 .mgmt-grid{display:grid;grid-template-columns:1fr;gap:16px}
 .mgmt-section{border:1px solid #e2e8f0;border-radius:12px;padding:14px;background:#f9fafb}
 .mgmt-title{font-weight:800;font-size:16px;color:#2d3748;margin-bottom:8px}
@@ -90,19 +83,22 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 .inline-btn{padding:6px 10px;border:2px solid #667eea;border-radius:8px;background:#fff;color:#667eea;font-weight:700;cursor:pointer}
 .inline-btn:hover{background:#667eea;color:#fff}
 .code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:12px;color:#4a5568;background:#edf2f7;border-radius:6px;padding:2px 6px}
+#err{display:none;margin-bottom:10px;padding:10px;border-radius:8px;background:#FED7D7;color:#822727;font-weight:700}
+@media (max-width:480px){.rate-grid{grid-template-columns:1fr}.question-text{font-size:18px}.score-display{font-size:48px}}
 </style>
 </head>
 <body>
 <div class="container">
   <div id="err"></div>
+
   <div id="homeScreen">
     <h1>文法テスト（確認式＋復習）</h1>
-    <div class="sub">ver.14M9 / 高校英語文法 定義問題</div>
-    <button class="button button-purple" onclick="startGrammarTest()">テストモード</button>
-    <button class="button button-orange" onclick="showPracticeMode()">練習モード</button>
-    <button class="button button-green" onclick="startReviewMode()">復習モード</button>
-    <button class="button button-blue" onclick="showManagement()">管理モード</button>
-    <div class="small">CSVは同フォルダの <code id="csvNameNote">grammar_definition_with_examples2.csv</code> を自動読込します。</div>
+    <div class="sub">MCQ版 / 文法4択問題（機能は既存と同等）</div>
+    <button class="button button-purple" id="btnTestMode">テストモード</button>
+    <button class="button button-orange" id="btnPracticeMode">練習モード</button>
+    <button class="button button-green" id="btnReviewMode">復習モード</button>
+    <button class="button button-blue" id="btnManagement">管理モード</button>
+    <div class="small">CSVは同フォルダの <code id="csvNameNote">grammar_mcq.csv</code> を自動読込します。列: id,question,choice1-4,answer,point,title,hint,explanation</div>
   </div>
 
   <div id="settingsScreen" class="hidden">
@@ -110,17 +106,17 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
     <div class="form-group">
       <label>モード</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
-        <div id="modeTest" class="select-button" style="text-align:center" onclick="selectMode('test')">テスト</div>
-        <div id="modePractice" class="select-button" style="text-align:center" onclick="selectMode('practice')">練習</div>
+        <div id="modeTest" class="select-button" style="text-align:center">テスト</div>
+        <div id="modePractice" class="select-button" style="text-align:center">練習</div>
       </div>
-      <div class="sub" id="modeNote">「解答を確認」で正解を表示 → 記憶度を3択で自己評価します（記述式なし）</div>
+      <div class="sub" id="modeNote">「解答を確認」で正解を表示 → 記憶度を3択で自己評価（4択式）</div>
     </div>
 
     <div class="form-group">
       <label>文法大項目（複数選択可）</label>
       <div class="select-controls">
-        <button class="select-button" onclick="selectAllMajorCategories()">全て選択</button>
-        <button class="select-button" onclick="deselectAllMajorCategories()">全て解除</button>
+        <button class="select-button" id="btnSelectAllMajor">全て選択</button>
+        <button class="select-button" id="btnDeselectAllMajor">全て解除</button>
       </div>
       <div class="checkbox-group" id="majorGroup"></div>
     </div>
@@ -128,8 +124,8 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
     <div class="form-group">
       <label>文法小項目（複数選択可）</label>
       <div class="select-controls">
-        <button class="select-button" onclick="selectAllItems()">全て選択</button>
-        <button class="select-button" onclick="deselectAllItems()">全て解除</button>
+        <button class="select-button" id="btnSelectAllItems">全て選択</button>
+        <button class="select-button" id="btnDeselectAllItems">全て解除</button>
       </div>
       <div class="checkbox-group" id="subCategoryGroup"></div>
     </div>
@@ -144,11 +140,18 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 
     <div class="form-group">
       <label>問題数</label>
-      <select id="questionCount">
-        <option value="5">5問</option>
-        <option value="10" selected>10問</option>
-        <option value="all">全問題</option>
-      </select>
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="questionCount" style="flex:1">
+          <option value="5">5問</option>
+          <option value="10" selected>10問</option>
+          <option value="15">15問</option>
+          <option value="20">20問</option>
+          <option value="30">30問</option>
+          <option value="all">全問題</option>
+          <option value="custom">カスタム</option>
+        </select>
+        <input type="number" id="customCount" min="1" max="999" placeholder="問題数" style="width:100px;display:none">
+      </div>
     </div>
 
     <div class="form-group" id="timeLimitGroup">
@@ -169,11 +172,11 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
     </div>
 
     <div class="form-group">
-  <label><input type="checkbox" id="optConceal" checked> 解答確認まで小項目名を隠す（POINT含む）</label>
-  <div class="small">テスト本番はON推奨。練習ではOFFにして学習の足場にできます。</div>
+  <label><input type="checkbox" id="optConceal" checked> 解答確認まで小項目名を隠す</label>
+  <div class="small">テスト本番はON推奨、練習ではOFF可</div>
 </div>
-<button class="button button-blue" onclick="startTest()">開始</button>
-    <button class="button button-gray" onclick="backToHome()">戻る</button>
+<button class="button button-blue" id="btnStartTest">開始</button>
+    <button class="button button-gray" id="btnBackFromSettings">戻る</button>
   </div>
 
   <div id="quizScreen" class="hidden">
@@ -189,43 +192,40 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
         <div id="questionTitle" class="question-title"></div>
         <div id="questionText" class="question-text"></div>
 
-        <!-- 1) ヒント -->
-        <button id="hintButton" class="hint-btn" type="button" style="display:none" onclick="toggleHint()">ヒントを見る</button>
+        <div id="choiceArea"></div>
+
+        <button id="hintButton" class="hint-btn" type="button" style="display:none">ヒントを見る</button>
         <div id="hintBox" class="hint-box">
           <div class="hint-label">ヒント</div>
           <div id="hintText" class="hint-text"></div>
         </div>
 
-        <!-- 2) 例文 -->
-        <button id="toggleExampleBtn" class="button button-gray" style="margin-top:8px" onclick="toggleExample()">例文を表示</button>
-        <div id="exampleBox" class="example-box hidden">
-          <div style="font-size:12px;color:#718096;font-weight:700;margin-bottom:6px;">例文</div>
-          <div id="exampleEn" style="font-size:15px;color:#2d3748;"></div>
-          <div id="exampleJp" style="font-size:14px;color:#4a5568;margin-top:4px;"></div>
-          <div id="exampleNone" class="example-dim hidden">（例文は登録されていません）</div>
-        </div>
-
-        <!-- 3) 解答 -->
-        <button id="confirmButton" class="button button-blue" onclick="confirmAnswer()">解答を確認</button>
+        <button id="confirmButton" class="button button-blue">解答を確認</button>
         <div id="modelAnswer" class="model-answer">
-          <div class="model-answer-label">模範解答</div>
+          <div class="model-answer-label">正解</div>
           <div id="modelAnswerText" class="model-answer-text"></div>
+        </div>
+        
+        <button id="explanationButton" class="explanation-btn" type="button" style="display:none">解説を見る</button>
+        <div id="explanationBox" class="explanation-box">
+          <div class="explanation-label">解説</div>
+          <div id="explanationText" class="explanation-text"></div>
         </div>
       </div>
 
       <div>
         <div id="rateArea" class="hidden">
           <div class="rate-grid">
-            <button id="btnPerfect" class="rate-btn perfect" onclick="rateCurrent('perfect')">完璧に覚えた</button>
-            <button id="btnSome" class="rate-btn some" onclick="rateCurrent('some')">まだ完璧ではない</button>
-            <button id="btnNone" class="rate-btn none" onclick="rateCurrent('none')">ぜんぜん覚えられていない</button>
+            <button id="btnPerfect" class="rate-btn perfect">完璧に覚えた</button>
+            <button id="btnSome" class="rate-btn some">まだ完璧ではない</button>
+            <button id="btnNone" class="rate-btn none">ぜんぜん覚えられていない</button>
           </div>
           <div id="rateFeedback">保存しました。</div>
-          <div class="rate-note">※「まだ」「ぜんぜん」を選ぶと自動的に復習リストに追加されます（ローカル保存）</div>
+          <div class="rate-note">※「まだ」「ぜんぜん」で復習リストに追加（ローカル保存）</div>
         </div>
 
-        <button id="nextButton" class="button button-blue hidden" onclick="nextQuestion()">次の問題へ</button>
-        <button id="finishButton" class="button button-orange hidden" onclick="finishTest()">テストを終了</button>
+        <button id="nextButton" class="button button-blue hidden">次の問題へ</button>
+        <button id="finishButton" class="button button-orange hidden">テストを終了</button>
       </div>
     </div>
   </div>
@@ -238,12 +238,11 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
       <div class="result-item"><span>所要時間</span><span id="elapsedTime"></span></div>
       <div class="result-item"><span>復習に追加</span><span id="reviewAddedCount"></span></div>
     </div>
-    <div id="detailedResults"></div>
-    <button class="button button-green" onclick="startReviewMode()">復習モードでやる</button>
-    <button class="button button-gray" onclick="backToHome()">メニューに戻る</button>
+    <div id="detailedResults" class="small"></div>
+    <button class="button button-green" id="btnReviewFromResult">復習モードでやる</button>
+    <button class="button button-gray" id="btnHomeFromResult">メニューに戻る</button>
   </div>
 
-  <!-- 管理モード（パスワードなし） -->
   <div id="managementScreen" class="hidden">
     <h2>管理モード</h2>
     <div class="mgmt-grid">
@@ -251,17 +250,17 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
         <div class="mgmt-title">復習リスト管理</div>
         <div id="reviewListBox" class="item-list"></div>
         <div class="inline-controls">
-          <button class="inline-btn" onclick="exportReviewList()">復習リストを書き出す</button>
-          <button class="inline-btn" onclick="importReviewList()">復習リストを読み込む</button>
-          <button class="button button-red" style="width:auto" onclick="clearReviewAll()">復習リストを全削除</button>
+          <button class="inline-btn" id="btnExportReview">復習リストを書き出す</button>
+          <button class="inline-btn" id="btnImportReview">復習リストを読み込む</button>
+          <button class="button button-red" style="width:auto" id="btnClearReview">復習リストを全削除</button>
         </div>
-        <div class="mgmt-note">ブラウザのローカル保存を利用します。端末が変わるとリストは共有されません。</div>
+        <div class="mgmt-note">ブラウザのローカル保存を利用。端末間共有は不可。</div>
       </div>
       <div class="mgmt-section">
         <div class="mgmt-title">項目別の問題一覧</div>
         <div class="form-group">
           <label>文法小項目（POINT）を選択</label>
-          <select id="itemSelector" onchange="renderItemQuestions()">
+          <select id="itemSelector">
             <option value="">（小項目を選択）</option>
           </select>
         </div>
@@ -270,562 +269,35 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
       </div>
     </div>
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="button button-gray" style="width:auto" onclick="backToHome()">メニューに戻る</button>
+      <button class="button button-gray" style="width:auto" id="btnHomeFromMgmt">メニューに戻る</button>
     </div>
   </div>
 </div>
 
-<!-- Persistent home button -->
-<button class="home-fab" onclick="goHomeSafely()" title="ホームに戻る">
-  <span class="icon">🏠</span><span>ホームに戻る</span>
-</button>
+<button class="home-fab" id="homeFab" title="ホームに戻る"><span class="icon">🏠</span><span>ホームに戻る</span></button>
 
 <script>
-const DEFAULT_CSVS = ['grammar_mcq.csv','grammar_definition_with_examples2.csv','grammar_definition.csv'];
-document.getElementById('csvNameNote').textContent = DEFAULT_CSVS[0];
+// データとグローバル変数
+const DEFAULT_CSVS = ['grammar_mcq.csv.csv', 'grammar_mcq.csv', 'grammar_definition_with_examples2.csv', 'grammar_definition.csv'];
+let questionData=[];
+let currentQuestions=[];
+let currentQuestion=0;
+let startTime=null;
+let timerInterval=null;
+let timeLimit=10;
+let testMode='test';
+let selectedCategories=[];
+let reviewPool=[];
+let reviewAddedNow=0;
+let selectedAnswer=null;
+let correctCount=0;
 
-// surface errors on screen
-window.addEventListener('error', (e)=>{
-  const box=document.getElementById('err');
-  box.textContent = 'スクリプトエラー: ' + (e.message||'') + '（詳細はブラウザのコンソールを参照）';
-  box.style.display='block';
-});
+// 追加: 出題中のタイトル/POINTを隠すフラグ（テスト既定ON）
+let concealTitles = true;
 
-let questionData = [];        
-let currentQuestions = [];
-let currentQuestion = 0;
-let startTime = null;
-let timerInterval = null;
-let timeLimit = 10;
-let testMode = 'test';        
-let selectedCategories = [];
-let reviewPool = [];          
-let reviewAddedNow = 0;
-let concealTitles = true;  // 出題中はタイトル/POINTを隠す（テスト既定）
-
-function showScreen(id){
-  ['homeScreen','settingsScreen','quizScreen','resultScreen','managementScreen']
-  .forEach(sid => { const el = document.getElementById(sid); if(el) el.classList.add('hidden'); });
-  const target=document.getElementById(id);
-  if(target) target.classList.remove('hidden');
-}
-function backToHome(){
-  resetState();
-  showScreen('homeScreen');
-}
-function resetState(){
-  currentQuestions = [];
-  currentQuestion = 0;
-  startTime = null;
-  if(timerInterval) clearInterval(timerInterval);
-  reviewAddedNow = 0;
-  const ma=document.getElementById('modelAnswer'); if(ma) ma.style.display='none';
-  const ra=document.getElementById('rateArea'); if(ra) ra.classList.add('hidden');
-  ['btnPerfect','btnSome','btnNone'].forEach(id=>{
-    const b=document.getElementById(id); if(b){ b.classList.remove('selected'); b.disabled=false; }
-  });
-  const fb=document.getElementById('rateFeedback'); if(fb){ fb.style.display='none'; fb.textContent='保存しました。'; }
-  const nb=document.getElementById('nextButton'); if(nb) nb.classList.add('hidden');
-  const fb2=document.getElementById('finishButton'); if(fb2) fb2.classList.add('hidden');
-  const hb=document.getElementById('hintBox'); if(hb) hb.style.display='none';
-  const hbBtn=document.getElementById('hintButton'); if(hbBtn) hbBtn.style.display='none';
-  const ex=document.getElementById('exampleBox'); if(ex){ ex.classList.add('hidden'); }
-  const exBtn=document.getElementById('toggleExampleBtn'); if(exBtn){ exBtn.textContent='例文を表示'; }
-  const exNone=document.getElementById('exampleNone'); if(exNone){ exNone.classList.add('hidden'); }
-}
-
-// Safe home navigation
-function goHomeSafely(){
-  const quizVisible = !document.getElementById('quizScreen').classList.contains('hidden');
-  if(quizVisible && currentQuestions.length){
-    const ok = confirm('進行中のセッションを終了してホームに戻ります。よろしいですか？');
-    if(!ok) return;
-  }
-  backToHome();
-}
-
-document.addEventListener('DOMContentLoaded', async ()=>{
-  buildCategoryUI();
-  updateSubCategories();
-  loadReviewPool();
-  await autoLoadCSV();
-  buildItemSelector();  // 管理モードの項目セレクタを作成
-});
-
-async function autoLoadCSV(){
-  for (const name of DEFAULT_CSVS){
-    try{
-      const res = await fetch(name, {cache:'no-store'});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const text = await res.text();
-      const rows = parseCSV(text);
-      questionData = rowsToQuestions(rows);
-      console.log(`[CSV] Loaded ${questionData.length} rows from ${name}`);
-      document.getElementById('csvNameNote').textContent = name;
-      return;
-    }catch(e){
-      console.warn(`[CSV] Failed to load ${name}`, e);
-    }
-  }
-  questionData = [
-    {id:'001',question:'現在形の定義は？',answer:'昨日も今日も明日も変わらない',point:'POINT 1',title:'基本３時制の定義',subId:'001'}
-  ];
-}
-
-// CSV parser
-function parseCSV(text){
-  const rows=[]; let row=[]; let cur=''; let inQ=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i], n=text[i+1];
-    if(inQ){
-      if(c==='\"'){
-        if(n==='\"'){ cur+='\"'; i++; }
-        else{ inQ=false; }
-      }else cur+=c;
-    }else{
-      if(c==='\"'){ inQ=true; }
-      else if(c===','){ row.push(cur); cur=''; }
-      else if(c==='\r'){ /* skip */ }
-      else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
-      else cur+=c;
-    }
-  }
-  if(cur.length>0 || row.length>0){ row.push(cur); rows.push(row); }
-  return rows;
-}
-
-// Normalizers
-function normalizeHeader(h){
-  return (h||'').toString().trim().toLowerCase().replace(/[\s_]+/g,'');
-}
-function normalizeTitle(s){
-  return (s||'')
-    .toString()
-    .trim()
-    .replace(/\u301c/g,'\uff5e')
-    .replace(/\s+/g,'')
-    ;
-}
-
-// Title→ID map
-const titleToItemIdMapRaw = {
-  "基本３時制の定義":"001","様々な未来表現":"002","進行形の定義":"003","進行形のルール":"004","「時や条件」を表す副詞節で用いる現在形":"005",
-  "現在完了形の用法①～完了・結果・経験～":"006","現在完了形の用法②～継続～":"007","現在完了形の用法③～注意点～":"008",
-  "過去完了形の用法①～完了・結果・経験～":"009","過去完了形の用法②～継続～":"010","過去完了形の用法③～大過去～":"011",
-  "未来完了形の用法①～完了・結果・経験と継続～":"012","未来完了形の用法②～注意点～":"013","受動態の基本":"014","様々な形の受動態":"015",
-  "受動態の疑問文":"016","第４文型の受動態":"017","第５文型の受動態":"018","思考認知告示動詞の受動態":"019","注意すべき受動態の表現①～be known～":"020",
-  "注意すべき受動態の表現②～感情表現～":"021","注意すべき受動態の表現③～被害表現～":"022","注意すべき受動態の表現④～その他の頻出表現～":"023",
-  "be動詞の代わりに使える「動作動詞」と「状態動詞」":"024","注意すべき受動態の表現⑤～受動態を使わない表現～":"025","群動詞（熟語）の受動態":"026",
-  "canの基本":"027","couldを理解しよう":"028","mayの基本":"029","mightの基本":"030","mustの基本":"031","mustとhave toの違いを理解しよう":"032",
-  "shouldの基本":"033","shouldの仲間①ought toV":"034","shouldの仲間②had better V原形":"035","willの基本":"036","wouldの基本":"037",
-  "used to V原形～の基本":"038","shallの基本":"039","needの基本":"040","助動詞 have Vp.p.シリーズ":"041","慣用表現シリーズ":"042",
-  "that節で用いられる想念のshould①":"043","that節で用いられる想念のshould②":"044","不定詞の基本① 名詞的用法":"045","不定詞の基本② 形容詞的用法":"046",
-  "不定詞の基本③ 副詞的用法":"047","ＳＶＯ＋toＶ～":"048","不定詞の意味上の主語①":"049","不定詞の意味上の主語②":"050","使役動詞（原形不定詞）":"051",
-  "知覚動詞":"052","～ようだシリーズ":"053","時制の不一致":"054","様々な形の不定詞～進行形・受動態・否定～":"055","疑問詞 toV～シリーズ":"056","独立不定詞":"057",
-  "be to 不定詞":"058","難易度を表す形容詞＋ toV～":"059","代不定詞":"060","不定詞の熟語①":"061","不定詞の熟語②":"062","動名詞の基本":"063",
-  "動名詞と不定詞の違い":"064","動名詞の意味上の主語と否定語の位置":"065","動名詞の受動態":"066","時制の不一致":"067","動名詞を使った重要表現①":"068",
-  "動名詞を使った重要表現②":"069","動名詞と不定詞①":"070","動名詞と不定詞②":"071","動名詞と不定詞③":"072","現在分詞の基本":"073","過去分詞の基本":"074",
-  "補語になる分詞（第２文型）":"075","補語になる分詞（第５文型）①":"076","補語になる分詞（第５文型）②":"077","分詞構文の基本":"078","分詞構文の作り方":"079",
-  "分詞構文の和訳":"080","時制の不一致＆独立分詞構文":"081","接続詞を省略しない分詞構文":"082","慣用的な分詞構文":"083","付帯状況を表すwith":"084",
-  "形容詞になっちまった分詞":"085","直接法と仮定法":"086","仮定法過去（現在の妄想）":"087","仮定法過去完了（過去の妄想）":"088","wishとas ifを用いた仮定法":"089",
-  "未来の妄想":"090","ifの省略":"091","if節を使わない仮定法表現":"092","仮定法を使った慣用表現":"093","仮定法ミックス（過去に～だったら、いま…なのになぁ）":"094",
-  "関係代名詞の基本":"095","関係代名詞that":"096","前置詞と関係代名詞":"097","関係副詞when":"098","関係副詞whyとhow":"099","先行詞を省略できるケース":"100",
-  "関係詞の非制限用法":"101","非制限用法の使い方":"102","関係副詞where":"103","関係詞代名詞what":"104","関係詞代名詞whatを用いた慣用表現":"105",
-  "複合関係詞の概要":"106","副詞節（譲歩）を作る複合関係代名詞①":"107","副詞節（譲歩）を作る複合関係代名詞②":"108","名詞節を作る複合関係代名詞":"109",
-  "関係代名詞としてのthanとbut":"110","関係代名詞としてのas":"111","マニア向け関係代名詞":"112","原級比較の基本":"113","asの倍数表現":"114",
-  "asを用いた慣用表現①":"115","asを用いた慣用表現②":"116","asを用いた慣用表現③":"117","比較級の基本":"118","差を具体的に表す比較級":"119",
-  "比較級の倍数表現":"120","不規則変化する形容詞・副詞":"121","lessを用いた比較級":"122","比較級を用いた慣用表現①":"123","比較級を用いた慣用表現②":"124",
-  "比較級を用いた慣用表現③":"125","比較級を用いた慣用表現④":"126","noを使った比較表現①":"127","noを使った比較表現②":"128","最上級の基本":"129",
-  "最上級を用いた表現①":"130","最上級を用いた表現②":"131","最上級の意味を表す原級・比較表現":"132"
-};
-const normalizedTitleMap = {}; Object.keys(titleToItemIdMapRaw).forEach(k => { normalizedTitleMap[normalizeTitle(k)] = titleToItemIdMapRaw[k]; });
-
-function rowsToQuestions(rows){
-  if(!rows || !rows.length) return [];
-  const rawHeader = rows[0];
-  const header = rawHeader.map(normalizeHeader);
-
-  const idx = (name)=> header.indexOf(normalizeHeader(name));
-  const idI = idx('id');
-  const qI=idx('question');
-  const aI=idx('answer');
-  const pI=idx('point');
-  const tI=idx('title');
-  const hI = (idx('hint')>=0?idx('hint'):idx('hints'));
-  const eEI = (idx('exampleen')>=0?idx('exampleen'):idx('example_en'));
-  const eJI = (idx('examplejp')>=0?idx('examplejp'):idx('example_jp'));
-
-  const out=[];
-  for(let i=1;i<rows.length;i++){
-    const r=rows[i]; if(!r || r.length===0) continue;
-    const get = (I)=> (I>=0 && I<r.length) ? (r[I]||'') : '';
-
-    const idRaw = (get(idI)).toString().trim();
-    const id = idRaw.padStart(3,'0');
-    const titleRaw = (get(tI)).toString();
-    const title = titleRaw.trim();
-    const pointRaw = (get(pI)).toString();
-
-    let subId = null;
-    const m = pointRaw.match(/(\d{1,3})/);
-    if(m){
-      const num = parseInt(m[1],10);
-      if(num>=1 && num<=132) subId = String(num).padStart(3,'0');
-    }
-    if(!subId){
-      const norm = normalizeTitle(title);
-      if(normalizedTitleMap[norm]) subId = normalizedTitleMap[norm];
-    }
-    if(!subId){ subId = id; }
-
-    out.push({
-      id,
-      question: (get(qI)).toString().trim(),
-      answer: (get(aI)).toString().trim(),
-      point: pointRaw.trim(),
-      title,
-      subId,
-      hint: (get(hI)).toString().trim(),
-      exampleEn: (get(eEI)).toString().trim(),
-      exampleJp: (get(eJI)).toString().trim()
-    });
-  }
-  return out;
-}
-
-// Review pool
-const REVIEW_KEY='grammarReviewPoolV1';
-function loadReviewPool(){
-  try{ reviewPool = JSON.parse(localStorage.getItem(REVIEW_KEY)||'[]'); if(!Array.isArray(reviewPool)) reviewPool=[]; }
-  catch(_){ reviewPool=[]; }
-}
-function saveReviewPool(){ localStorage.setItem(REVIEW_KEY, JSON.stringify(reviewPool)); }
-function addToReview(q){
-  if(!q || !q.id) return;
-  if(!reviewPool.some(x=>String(x.id)===String(q.id))){
-    reviewPool.push(q);
-    saveReviewPool();
-    reviewAddedNow++;
-  }
-}
-function removeFromReview(id){
-  const before = reviewPool.length;
-  reviewPool = reviewPool.filter(x=>String(x.id)!==String(id));
-  if(reviewPool.length!==before) saveReviewPool();
-}
-
-// Modes
-function selectMode(m){
-  testMode=m;
-  document.getElementById('timeLimitGroup').style.display=(m==='test')?'block':'none';
-  document.getElementById('studentInfoGroup').style.display=(m==='test')?'block':'none';
-
-  // concealTitles 既定（test:true / practice:false）
-  concealTitles = (m==='test');
-  const opt=document.getElementById('optConceal'); if(opt){ opt.checked = !!concealTitles; }
-}
-function showPracticeMode(){ showScreen('settingsScreen'); selectMode('practice'); updateSubCategories(); }
-function startGrammarTest(){ showScreen('settingsScreen'); selectMode('test'); updateSubCategories(); }
-
-// Start
-function startTest(){
-  // UIオプション反映
-  const opt=document.getElementById('optConceal'); if(opt){ concealTitles = !!opt.checked; }
-  if(selectedCategories.length===0){ alert('文法小項目を1つ以上選択してください'); return; }
-  let filtered = questionData.filter(q=>{const sid=String(q.subId||'').trim();const norm=/^\d+$/.test(sid)?sid.padStart(3,'0'):sid.toUpperCase();return selectedCategories.includes(norm);});
-  if(filtered.length===0){
-    const sel = selectedCategories.join(', ');
-    alert(`選択した項目に問題がありません（選択: ${sel}）。CSVのPOINT列に数値が入っているかをご確認ください。`);
-    return;
-  }
-
-  const order=document.getElementById('questionOrder').value;
-  if(order==='shuffle') filtered = shuffle(filtered);
-
-  const count=document.getElementById('questionCount').value;
-  if(count!=='all') filtered = filtered.slice(0, parseInt(count,10));
-
-  currentQuestions = filtered.map(q=>({...q}));
-  currentQuestion = 0; reviewAddedNow=0;
-
-  if(testMode==='test'){
-    timeLimit=parseInt(document.getElementById('timeLimit').value||'10',10);
-    startTime=Date.now();
-    const update=()=>{
-      const elapsed=Math.floor((Date.now()-startTime)/1000);
-      const remaining=timeLimit*60 - elapsed;
-      if(timeLimit>0){
-        if(remaining<=0){ clearInterval(timerInterval); finishTest(); return; }
-        const mm=String(Math.floor(remaining/60)).padStart(2,'0');
-        const ss=String(remaining%60).padStart(2,'0');
-        document.getElementById('timer').textContent = `残り時間: ${mm}:${ss}`;
-      }else{ document.getElementById('timer').textContent=''; }
-    };
-    update(); timerInterval=setInterval(update,1000);
-  }else{
-    document.getElementById('timer').textContent='';
-  }
-
-  showScreen('quizScreen');
-  renderQuestion();
-}
-
-function startReviewMode(){
-  loadReviewPool();
-  if(!reviewPool.length){ alert('復習リストが空です。「まだ／ぜんぜん」で追加してください。'); return; }
-  testMode='review';
-  currentQuestions = reviewPool.map(q=>({...q}));
-  currentQuestion=0; reviewAddedNow=0;
-  document.getElementById('timer').textContent='';
-  showScreen('quizScreen');
-  renderQuestion();
-}
-
-// Render
-function renderQuestion(){
-  if(currentQuestion>=currentQuestions.length){ finishTest(); return; }
-  const q=currentQuestions[currentQuestion];
-  document.getElementById('questionNumber').textContent=`問${currentQuestion+1} / ${currentQuestions.length}`;
-  document.getElementById('pointBadge').textContent = concealTitles ? '' : (q.point||'');
-  document.getElementById('questionTitle').innerHTML = concealTitles ? '' : bar2br(q.title||'');
-  document.getElementById('questionText').innerHTML = bar2br(q.question||'');
-  document.getElementById('modelAnswerText').innerHTML = bar2br(q.answer||'');
-  document.getElementById('exampleEn').innerHTML = bar2br(q.exampleEn||'');
-  document.getElementById('exampleJp').innerHTML = bar2br(q.exampleJp||'');
-  document.getElementById('hintText').innerHTML = bar2br(q.hint||'');
-
-  document.getElementById('modelAnswer').style.display='none';
-  document.getElementById('rateArea').classList.add('hidden');
-  ['btnPerfect','btnSome','btnNone'].forEach(id=>{
-    const b=document.getElementById(id); if(b){ b.classList.remove('selected'); b.disabled=false; }
-  });
-  const fb=document.getElementById('rateFeedback'); fb.style.display='none'; fb.textContent='保存しました。';
-
-  document.getElementById('nextButton').classList.add('hidden');
-  document.getElementById('finishButton').classList.add('hidden');
-  document.getElementById('confirmButton').disabled=false;
-
-  const ex=document.getElementById('exampleBox'); ex.classList.add('hidden');
-  document.getElementById('toggleExampleBtn').textContent='例文を表示';
-  const hasHint = !!(q.hint && q.hint.trim().length);
-  document.getElementById('hintButton').style.display = hasHint ? 'inline-block' : 'none';
-  document.getElementById('hintBox').style.display='none';
-}
-
-function confirmAnswer(){
-  document.getElementById('modelAnswer').style.display='block';
-  document.getElementById('rateArea').classList.remove('hidden');
-  document.getElementById('confirmButton').disabled=true;
-  document.getElementById('nextButton').classList.remove('hidden');
-  if(currentQuestion === currentQuestions.length-1){
-    document.getElementById('finishButton').classList.remove('hidden');
-  
-  // 解答確認後にタイトル/POINTを開示
-  try{
-    const q=currentQuestions[currentQuestion];
-    document.getElementById('pointBadge').textContent = q.point||'';
-    document.getElementById('questionTitle').innerHTML = bar2br(q.title||'');
-  }catch(_){/*noop*/}
-}
-  document.getElementById('modelAnswer').scrollIntoView({behavior:'smooth', block:'center'});
-}
-
-function rateCurrent(level){
-  const q=currentQuestions[currentQuestion];
-  ['btnPerfect','btnSome','btnNone'].forEach(id=>{ const b=document.getElementById(id); b.classList.remove('selected'); });
-  if(level==='perfect'){ document.getElementById('btnPerfect').classList.add('selected'); }
-  if(level==='some'){ document.getElementById('btnSome').classList.add('selected'); }
-  if(level==='none'){ document.getElementById('btnNone').classList.add('selected'); }
-  const fb=document.getElementById('rateFeedback');
-  if(level==='some' || level==='none'){ addToReview(q); fb.textContent='復習リストに追加しました。'; }
-  else{ fb.textContent='了解。次へ進めます。'; }
-  fb.style.display='block';
-}
-
-function nextQuestion(){
-  currentQuestion++;
-  renderQuestion();
-}
-
-function finishTest(){
-  if(timerInterval) clearInterval(timerInterval);
-  const total = currentQuestions.length;
-  let elapsed = 0;
-  if(startTime){ elapsed = Math.floor((Date.now()-startTime)/1000); }
-  const mm=String(Math.floor(elapsed/60)).padStart(2,'0');
-  const ss=String(elapsed%60).padStart(2,'0');
-
-  document.getElementById('totalCount').textContent = total;
-  document.getElementById('elapsedTime').textContent = `${mm}:${ss}`;
-  document.getElementById('reviewAddedCount').textContent = reviewAddedNow;
-  document.getElementById('scoreDisplay').textContent = `${total} 問 完了`;
-
-  showScreen('resultScreen');
-}
-
-// Example/Hint
-function toggleExample(){
-  const box=document.getElementById('exampleBox');
-  const btn=document.getElementById('toggleExampleBtn');
-  const q=currentQuestions[currentQuestion]||{};
-  const hasAny = (q.exampleEn && q.exampleEn.trim()) || (q.exampleJp && q.exampleJp.trim());
-  document.getElementById('exampleNone').classList.toggle('hidden', !!hasAny);
-  if(box.classList.contains('hidden')){ box.classList.remove('hidden'); btn.textContent='例文を隠す'; }
-  else{ box.classList.add('hidden'); btn.textContent='例文を表示'; }
-}
-function toggleHint(){
-  const box=document.getElementById('hintBox');
-  box.style.display = (box.style.display==='none' || box.style.display==='') ? 'block' : 'none';
-}
-
-// === 管理モード ===
-function showManagement(){
-  renderReviewList();
-  buildItemSelector();
-  renderItemQuestions();
-  showScreen('managementScreen');
-}
-
-function renderReviewList(){
-  const box=document.getElementById('reviewListBox');
-  loadReviewPool();
-  if(!reviewPool.length){ box.innerHTML='<div class="item-row" style="text-align:center;color:#718096">（復習リストは空です）</div>'; return; }
-  const rows = reviewPool.map(q=>{
-    const title = q.title?`<div style="font-size:12px;color:#718096">${escapeHTML(q.title)}</div>`:'';
-    return `<div class="item-row">
-      <div style="font-weight:700">${escapeHTML(q.id)}. ${escapeHTML(q.question||'')}</div>
-      ${title}
-      <div class="inline-controls">
-        <button onclick="removeFromReview('${q.id}');renderReviewList();" class="inline-btn">復習から削除</button>
-        <button onclick="previewQA('${q.id}')" class="inline-btn">内容を見る</button>
-      </div>
-    </div>`;
-  }).join('');
-  box.innerHTML = rows;
-}
-
-function previewQA(id){
-  const q = (reviewPool.find(x=>String(x.id)===String(id))) || (questionData.find(x=>String(x.id)===String(id)));
-  if(!q){ alert('データが見つかりません。'); return; }
-  const msg = `【${q.point||''}】${q.title||''}\n\n問題: ${q.question||''}\n\nヒント: ${q.hint||'(なし)'}\n\n例文(EN): ${q.exampleEn||'(なし)'}\n例文(JP): ${q.exampleJp||'(なし)'}\n\n解答: ${q.answer||''}`;
-  alert(msg);
-}
-
-function clearReviewAll(){
-  if(!confirm('復習リストをすべて削除します。よろしいですか？')) return;
-  reviewPool=[]; saveReviewPool(); renderReviewList();
-}
-
-// エクスポート／インポート（JSON）
-function exportReviewList(){
-  loadReviewPool();
-  const blob = new Blob([JSON.stringify(reviewPool, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'review_list.json';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-}
-function importReviewList(){
-  const inp = document.createElement('input');
-  inp.type='file'; inp.accept='application/json';
-  inp.onchange = (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      try{
-        const data = JSON.parse(reader.result);
-        if(Array.isArray(data)){ reviewPool = data; saveReviewPool(); renderReviewList(); alert('読み込みました。'); }
-        else alert('形式が正しくありません。');
-      }catch(_){ alert('読み込みに失敗しました。'); }
-    };
-    reader.readAsText(file);
-  };
-  inp.click();
-}
-
-// 項目別問題一覧
-function buildItemSelector(){
-  const sel = document.getElementById('itemSelector');
-  if(!sel) return;
-  // subId => title の代表値を作る（questionDataから）
-  const map = new Map();
-  questionData.forEach(q=>{
-    const id = String(q.subId||'').padStart(3,'0');
-    const name = q.title || id;
-    if(!map.has(id)) map.set(id, name);
-  });
-  // データがない場合は grammarData からフルリスト
-  if(map.size===0){
-    Object.values(grammarData).forEach(cat=>{
-      (cat.items||[]).forEach(it=>{ map.set(it.id, it.name); });
-    });
-  }
-  // 一旦クリアしてから追加
-  sel.innerHTML = '<option value="">（小項目を選択）</option>';
-  const arr = Array.from(map.entries()).sort((a,b)=>a[0].localeCompare(b[0]));
-  arr.forEach(([id, name])=>{
-    const opt = document.createElement('option');
-    opt.value = id; opt.textContent = `${id}. ${name}`;
-    sel.appendChild(opt);
-  });
-  // 既存選択があれば維持
-  const cur = sel.getAttribute('data-current');
-  if(cur){ sel.value = cur; }
-}
-
-function renderItemQuestions(){
-  const sel = document.getElementById('itemSelector');
-  const box = document.getElementById('itemQuestionsBox');
-  const info = document.getElementById('itemInfo');
-  if(!sel || !box) return;
-  const id = sel.value;
-  sel.setAttribute('data-current', id);
-  if(!id){
-    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（小項目を選択してください）</div>';
-    info.textContent='';
-    return;
-  }
-  const list = questionData.filter(q=>String(q.subId).padStart(3,'0')===String(id).padStart(3,'0'));
-  info.textContent = `この小項目の問題数: ${list.length} 件`;
-  if(list.length===0){
-    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（この項目の問題はCSVに見つかりませんでした）</div>';
-    return;
-  }
-  box.innerHTML = list.map(q=>{
-    const ex = (q.exampleEn||q.exampleJp) ? `<div class="small">例: <span class="code">${bar2br(escapeHTML(q.exampleEn||''))}</span> / <span class="code">${bar2br(escapeHTML(q.exampleJp||''))}</span></div>` : '';
-    return `<div class="item-row">
-      <div><span class="code">${escapeHTML(q.id)}</span> <strong>${escapeHTML(q.question||'')}</strong> <span class="badge">${escapeHTML(q.point||'')}</span></div>
-      <div class="small">解答: <span class="code">${bar2br(escapeHTML(q.answer||''))}</span></div>
-      ${ex}
-      <div class="inline-controls">
-        <button class="inline-btn" onclick="addToReviewById('${q.id}')">復習に追加</button>
-        <button class="inline-btn" onclick="removeFromReview('${q.id}');renderReviewList()">復習から削除</button>
-        <button class="inline-btn" onclick="previewQA('${q.id}')">内容を見る</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function addToReviewById(id){
-  const q = questionData.find(x=>String(x.id)===String(id));
-  if(!q){ alert('問題が見つかりません。'); return; }
-  addToReview(q);
-  renderReviewList();
-  alert('復習リストに追加しました。');
-}
-
-// Utils
-function bar2br(s){ return (s||'').toString().split('|').join('<br>'); }
-function bar2nl(s){ return (s||'').toString().split('|').join('\n'); }
-
-function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function escapeHTML(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-
-// Category UI (出題設定用)
 let grammarData = {
   tense:{name:"時制（TENSE）",items:[
-    {id:"001",name:"基本３時制の定義"},{id:"002",name:"様々な未来表現"},{id:"003",name:"進行形の定義"},
+    {id:"001",name:"基本４時制の定義"},{id:"002",name:"様々な未来表現"},{id:"003",name:"進行形の定義"},
     {id:"004",name:"進行形のルール"},{id:"005",name:"「時や条件」を表す副詞節で用いる現在形"},
     {id:"006",name:"現在完了形の用法①～完了・結果・経験～"},{id:"007",name:"現在完了形の用法②～継続～"},
     {id:"008",name:"現在完了形の用法③～注意点～"},{id:"009",name:"過去完了形の用法①～完了・結果・経験～"},
@@ -837,13 +309,13 @@ let grammarData = {
     {id:"017",name:"第４文型の受動態"},{id:"018",name:"第５文型の受動態"},{id:"019",name:"思考認知告示動詞の受動態"},
     {id:"020",name:"注意すべき受動態の表現①～be known～"},{id:"021",name:"注意すべき受動態の表現②～感情表現～"},
     {id:"022",name:"注意すべき受動態の表現③～被害表現～"},{id:"023",name:"注意すべき受動態の表現④～その他の頻出表現～"},
-    {id:"024",name:"be動詞の代わりに使える「動作動詞」と「状態動詞」"},{id:"025",name:"注意すべき受動態の表現⑤～受動態を使わない表現～"},
+    {id:"024",name:"be動詞の代わりに使える「動作動詞」と「状態動詞"},{id:"025",name:"注意すべき受動態の表現⑤～受動態を使わない表現～"},
     {id:"026",name:"群動詞（熟語）の受動態"}
   ]},
   auxiliary:{name:"助動詞（AUXILIARY VERB）",items:[
     {id:"027",name:"canの基本"},{id:"028",name:"couldを理解しよう"},{id:"029",name:"mayの基本"},{id:"030",name:"mightの基本"},
     {id:"031",name:"mustの基本"},{id:"032",name:"mustとhave toの違いを理解しよう"},{id:"033",name:"shouldの基本"},
-    {id:"034",name:"shouldの仲間①ought toV"},{id:"035",name:"shouldの仲間②had better V原形"},{id:"036",name:"willの基本"},
+    {id:"034",name:"shouldの仲間① ought toV"},{id:"035",name:"shouldの仲間②had better V原形"},{id:"036",name:"willの基本"},
     {id:"037",name:"wouldの基本"},{id:"038",name:"used to V原形～の基本"},{id:"039",name:"shallの基本"},
     {id:"040",name:"needの基本"},{id:"041",name:"助動詞 have Vp.p.シリーズ"},{id:"042",name:"慣用表現シリーズ"},
     {id:"043",name:"that節で用いられる想念のshould①"},{id:"044",name:"that節で用いられる想念のshould②"}
@@ -895,43 +367,9 @@ let grammarData = {
   ]}
 };
 
-function buildCategoryUI(){
-  const major=document.getElementById('majorGroup');
-  if(!major) return;
-  major.innerHTML='';
-  Object.keys(grammarData).forEach(key=>{
-    const label=document.createElement('label');
-    label.style.display='flex';label.style.alignItems='center';label.style.padding='4px 0';label.style.cursor='pointer';label.style.fontSize='14px';
-    label.innerHTML = `<input type="checkbox" value="${key}" style="margin-right:8px" onchange="updateSubCategories()"> ${grammarData[key].name}`;
-    major.appendChild(label);
-  });
-}
-function updateSubCategories(){
-  const sub=document.getElementById('subCategoryGroup'); if(!sub) return;
-  sub.innerHTML='';
-  const checkedMajors=[...document.querySelectorAll('#majorGroup input[type=checkbox]:checked')].map(cb=>cb.value);
-  const keys = checkedMajors.length?checkedMajors:Object.keys(grammarData);
-  keys.forEach(key=>{
-    const header=document.createElement('div');
-    header.style.fontWeight='700';header.style.color='#667eea';header.style.marginTop='10px';header.style.marginBottom='4px';header.style.fontSize='15px';
-    header.textContent = grammarData[key].name;
-    sub.appendChild(header);
-    grammarData[key].items.forEach(item=>{
-      const label=document.createElement('label');
-      label.style.display='flex';label.style.alignItems='center';label.style.padding='4px 0';label.style.cursor='pointer';label.style.fontSize='14px';
-      label.innerHTML = `<input type="checkbox" value="${item.id}" style="margin-right:8px" onchange="updateSelectedCategories()"> ${item.id}. ${item.name}`;
-      sub.appendChild(label);
-    });
-  });
-}
-function selectAllMajorCategories(){document.querySelectorAll('#majorGroup input[type=checkbox]').forEach(cb=>cb.checked=true);updateSubCategories();}
-function deselectAllMajorCategories(){document.querySelectorAll('#majorGroup input[type=checkbox]').forEach(cb=>cb.checked=false);updateSubCategories();}
-function selectAllItems(){document.querySelectorAll('#subCategoryGroup input[type=checkbox]').forEach(cb=>cb.checked=true);updateSelectedCategories();}
-function deselectAllItems(){document.querySelectorAll('#subCategoryGroup input[type=checkbox]').forEach(cb=>cb.checked=false);updateSelectedCategories();}
-function updateSelectedCategories(){selectedCategories=[...document.querySelectorAll('#subCategoryGroup input[type=checkbox]:checked')].map(cb=>(/^\d+$/.test(cb.value)?cb.value.padStart(3,'0'):cb.value.toUpperCase()));}
-
-// === PATCH: S01-S21追加 & 001-132名称をPOINT_list.xlsxで上書き ===
+// === PATCH: Inject S01-S21 and override POINT names from Excel ===
 (function() {
+  // Build structure category
   const structureItems = [
     {id:'S01', name:'品詞の理解①　名詞'},
     {id:'S02', name:'品詞の理解②　動詞'},
@@ -955,8 +393,11 @@ function updateSelectedCategories(){selectedCategories=[...document.querySelecto
     {id:'S20', name:'文の種類③命令文'},
     {id:'S21', name:'文の種類④感嘆文・There is構文'}
   ];
-  grammarData = Object.assign({ structure: { name: '品詞・文型', items: structureItems } }, grammarData);
+  // Turn const grammarData into ordered object with structure first
+  const withStructureFirst = Object.assign({ structure: { name: '品詞・文型', items: structureItems } }, grammarData);
+  grammarData = withStructureFirst;
 
+  // Override names for 001-132 from POINT_list.xlsx
   const NAME_OVERRIDES = {
   '001':'基本３時制の定義',
   '002':'様々な未来表現',
@@ -1049,9 +490,8 @@ function updateSelectedCategories(){selectedCategories=[...document.querySelecto
   '089':'仮定法ミックス（過去に～だったら、いま…なのになぁ）',
   '090':'wishとas ifを用いた仮定法',
   '091':'未来の妄想',
-  '092':'ifの省略',
-  '093':'if節を使わない仮定法表現',
-  '094':'仮定法を使った慣用表現',
+  '092':'if節を使わない仮定法表現',
+  '093':'仮定法を使った慣用表現',
   '095':'関係代名詞の基本',
   '096':'関係代名詞that',
   '097':'前置詞と関係代名詞',
@@ -1095,63 +535,869 @@ function updateSelectedCategories(){selectedCategories=[...document.querySelecto
     const cat = grammarData[catKey];
     if (!cat || !Array.isArray(cat.items)) continue;
     cat.items = cat.items.map(it => {
-      const id = String(it.id).trim();
+      const id = String(it.id).replace(/^POINT\s*/, '');
       if (/^\d+$/.test(id)) {
         const key = id.padStart(3,'0');
-        if (NAME_OVERRIDES[key]) return Object.assign({}, it, { id: key, name: NAME_OVERRIDES[key] });
+        if (NAME_OVERRIDES[key]) return Object.assign({}, it, { name: NAME_OVERRIDES[key], id: key });
         return Object.assign({}, it, { id: key });
       }
+      // Keep S-items as-is
       return it;
-    });
-  }
-
-  if (typeof normalizeTitle === 'function' && typeof normalizedTitleMap === 'object' && normalizedTitleMap) {
-    Object.keys(NAME_OVERRIDES).forEach(k => {
-      const nm = NAME_OVERRIDES[k];
-      normalizedTitleMap[ normalizeTitle(nm) ] = k;
-    });
-    Object.values(grammarData).forEach(cat => {
-      (cat.items||[]).forEach(it => {
-        normalizedTitleMap[ normalizeTitle(it.name||'') ] = String(it.id);
-      });
     });
   }
 })();
 // === END PATCH ===
 
-// 手動でCSVを選択して読み込む
-function pickCSV(){
-  try{
-    const inp = document.createElement('input');
-    inp.type='file'; inp.accept='.csv,text/csv';
-    inp.onchange = (e)=>{
-      const file = e.target.files && e.target.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        try{
-          const text = reader.result;
-          const rows = parseCSV(text);
-          questionData = rowsToQuestions(rows);
-          console.log(`[CSV] Loaded ${questionData.length} rows from file picker: ${file.name}`);
-          const note = document.getElementById('csvNameNote');
-          if (note) note.textContent = file.name;
-          try{ buildItemSelector(); }catch(_){}
-          alert('CSVを読み込みました。');
-        }catch(err){
-          console.error(err);
-          alert('CSVの読み込みに失敗しました。');
-        }
-      };
-      reader.readAsText(file, 'UTF-8');
-    };
-    inp.click();
-  }catch(e){
-    console.error(e);
-    alert('CSV選択でエラーが発生しました。');
+// 画面制御
+function showScreen(screenId) {
+  console.log('Showing screen:', screenId);
+  const screens = ['homeScreen', 'settingsScreen', 'quizScreen', 'resultScreen', 'managementScreen'];
+  screens.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.add('hidden');
+  });
+  const target = document.getElementById(screenId);
+  if(target) target.classList.remove('hidden');
+}
+
+function backToHome() { 
+  resetState(); 
+  showScreen('homeScreen'); 
+}
+
+function resetState() {
+  currentQuestions=[]; 
+  currentQuestion=0; 
+  startTime=null; 
+  if(timerInterval) clearInterval(timerInterval);
+  reviewAddedNow=0; 
+  selectedAnswer=null; 
+  correctCount=0;
+}
+
+// モード選択
+function selectMode(m) {
+  testMode = m;
+  document.getElementById('timeLimitGroup').style.display = (m === 'test') ? 'block' : 'none';
+  document.getElementById('studentInfoGroup').style.display = (m === 'test') ? 'block' : 'none';
+  
+  const testBtn = document.getElementById('modeTest');
+  const practiceBtn = document.getElementById('modePractice');
+  
+  if(m === 'test') {
+    testBtn.style.background = '#667eea';
+    testBtn.style.color = '#fff';
+    practiceBtn.style.background = '#fff';
+    practiceBtn.style.color = '#667eea';
+  } else {
+    practiceBtn.style.background = '#667eea';
+    practiceBtn.style.color = '#fff';
+    testBtn.style.background = '#fff';
+    testBtn.style.color = '#667eea';
   }
 }
 
+// CSV処理
+async function autoLoadCSV() {
+  for(const name of DEFAULT_CSVS) {
+    try {
+      const res = await fetch(name, {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      questionData = rowsToQuestions(rows);
+      console.log(`Loaded ${questionData.length} questions from ${name}`);
+      const note = document.getElementById('csvNameNote');
+      if(note) note.textContent = name;
+      return;
+    } catch(e) { 
+      console.warn(`Failed to load ${name}:`, e); 
+    }
+  }
+  // フォールバック
+  questionData = [{
+    id:'001',
+    question:'It is wrong (     ) a lie.',
+    choices:['to tell','to telling','tell','having told'],
+    answer:'to tell',
+    point:'POINT 045',
+    title:'不定詞の基本① 名詞的用法',
+    hint:'仮主語It + be形容詞 + to不定詞 の基本',
+    subId:'045'
+  }];
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cur = '';
+  let inQ = false;
+  
+  for(let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const n = text[i + 1];
+    if(inQ) {
+      if(c === '"') {
+        if(n === '"') { cur += '"'; i++; }
+        else { inQ = false; }
+      } else {
+        cur += c;
+      }
+    } else {
+      if(c === '"') { inQ = true; }
+      else if(c === ',') { row.push(cur); cur = ''; }
+      else if(c === '\r') {}
+      else if(c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else { cur += c; }
+    }
+  }
+  if(cur.length > 0 || row.length > 0) {
+    row.push(cur);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function rowsToQuestions(rows) {
+  if(!rows || !rows.length) return [];
+  const header = rows[0].map(h => (h||'').toLowerCase().trim());
+  
+  const idx = (name) => header.indexOf(name.toLowerCase());
+  const idI = idx('id');
+  const qI = idx('question');
+  const aI = idx('answer');
+  const pI = idx('point');
+  const tI = idx('title');
+  const hI = idx('hint') >= 0 ? idx('hint') : idx('hints');
+  const eI = idx('explanation');
+  const c1I = idx('choice1');
+  const c2I = idx('choice2');
+  const c3I = idx('choice3');
+  const c4I = idx('choice4');
+  
+  const out = [];
+  for(let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if(!r || r.length === 0) continue;
+    
+    const get = (I) => (I >= 0 && I < r.length) ? (r[I] || '') : '';
+    const id = get(idI).toString().trim();
+    if(!id) continue;
+    
+    const pointRaw = get(pI).toString();
+    let subId = id.toString().trim();
+    const mS = pointRaw.match(/S\d{2}/i);
+    if (mS) {
+      subId = mS[0].toUpperCase();
+    } else {
+      const m = pointRaw.match(/(\d{1,3})/);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        if (num >= 1 && num <= 132) subId = String(num).padStart(3, '0');
+      } else {
+        if (/^\d{1,3}$/.test(subId)) subId = subId.padStart(3, '0');
+      }
+    }
+    
+    const choices = [get(c1I), get(c2I), get(c3I), get(c4I)].filter(x => x !== '');
+    
+    out.push({
+      id: id.padStart(3, '0'),
+      question: get(qI).toString().trim(),
+      choices: choices.length ? choices : [],
+      answer: get(aI).toString().trim(),
+      point: pointRaw.trim(),
+      title: get(tI).toString().trim(),
+      subId: subId,
+      hint: get(hI).toString().trim(),
+      explanation: get(eI).toString().trim()
+    });
+  }
+  return out;
+}
+
+// 復習プール
+const REVIEW_KEY = 'grammarReviewPoolV1';
+
+function loadReviewPool() {
+  try {
+    reviewPool = JSON.parse(localStorage.getItem(REVIEW_KEY) || '[]');
+    if(!Array.isArray(reviewPool)) reviewPool = [];
+  } catch(_) {
+    reviewPool = [];
+  }
+}
+
+function saveReviewPool() {
+  localStorage.setItem(REVIEW_KEY, JSON.stringify(reviewPool));
+}
+
+function addToReview(q) {
+  if(!q || !q.id) return;
+  if(!reviewPool.some(x => String(x.id) === String(q.id))) {
+    reviewPool.push(q);
+    saveReviewPool();
+    reviewAddedNow++;
+  }
+}
+
+function removeFromReview(id) {
+  const before = reviewPool.length;
+  reviewPool = reviewPool.filter(x => String(x.id) !== String(id));
+  if(reviewPool.length !== before) saveReviewPool();
+}
+
+// 管理モード関連関数
+function showManagement() {
+  renderReviewList();
+  buildItemSelector();
+  renderItemQuestions();
+  showScreen('managementScreen');
+}
+
+function renderReviewList() {
+  const box = document.getElementById('reviewListBox');
+  loadReviewPool();
+  if(!reviewPool.length) {
+    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（復習リストは空です）</div>';
+    return;
+  }
+  const rows = reviewPool.map(q => {
+    const title = q.title ? `<div style="font-size:12px;color:#718096">${escapeHTML(q.title)}</div>` : '';
+    return `<div class="item-row">
+      <div style="font-weight:700">${escapeHTML(q.id)}. ${escapeHTML(q.question || '')}</div>
+      ${title}
+      <div class="inline-controls">
+        <button onclick="removeFromReviewAndRefresh('${q.id}')" class="inline-btn">復習から削除</button>
+        <button onclick="previewQA('${q.id}')" class="inline-btn">内容を見る</button>
+      </div>
+    </div>`;
+  }).join('');
+  box.innerHTML = rows;
+}
+
+function removeFromReviewAndRefresh(id) {
+  removeFromReview(id);
+  renderReviewList();
+}
+
+function previewQA(id) {
+  const q = reviewPool.find(x => String(x.id) === String(id)) || 
+             questionData.find(x => String(x.id) === String(id));
+  if(!q) {
+    alert('データが見つかりません。');
+    return;
+  }
+  const msg = `【${q.point || ''}】${q.title || ''}\n\n問題: ${q.question || ''}\n\n選択肢: ${(q.choices || []).join(' / ')}\n\nヒント: ${q.hint || '(なし)'}\n\n正解: ${q.answer || ''}`;
+  alert(msg);
+}
+
+function clearReviewAll() {
+  if(!confirm('復習リストをすべて削除します。よろしいですか？')) return;
+  reviewPool = [];
+  saveReviewPool();
+  renderReviewList();
+}
+
+function exportReviewList() {
+  loadReviewPool();
+  const blob = new Blob([JSON.stringify(reviewPool, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'review_list.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function importReviewList() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json';
+  inp.onchange = (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if(Array.isArray(data)) {
+          reviewPool = data;
+          saveReviewPool();
+          renderReviewList();
+          alert('読み込みました。');
+        } else {
+          alert('形式が正しくありません。');
+        }
+      } catch(_) {
+        alert('読み込みに失敗しました。');
+      }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// 項目別問題一覧
+function buildItemSelector() {
+  const sel = document.getElementById('itemSelector');
+  if(!sel) return;
+  const map = new Map();
+  
+  questionData.forEach(q => {
+    const id = String(q.subId || '').padStart(3, '0');
+    const name = q.title || id;
+    if(!map.has(id)) map.set(id, name);
+  });
+  
+  if(map.size === 0) {
+    Object.values(grammarData).forEach(cat => {
+      (cat.items || []).forEach(it => {
+        map.set(it.id, it.name);
+      });
+    });
+  }
+  
+  sel.innerHTML = '<option value="">（小項目を選択）</option>';
+  const arr = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  arr.forEach(([id, name]) => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = `${id}. ${name}`;
+    sel.appendChild(opt);
+  });
+}
+
+function renderItemQuestions() {
+  const sel = document.getElementById('itemSelector');
+  const box = document.getElementById('itemQuestionsBox');
+  const info = document.getElementById('itemInfo');
+  if(!sel || !box) return;
+  
+  const id = sel.value;
+  if(!id) {
+    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（小項目を選択してください）</div>';
+    info.textContent = '';
+    return;
+  }
+  
+  const list = questionData.filter(q => String(q.subId).padStart(3, '0') === String(id).padStart(3, '0'));
+  info.textContent = `この小項目の問題数: ${list.length} 件`;
+  
+  if(list.length === 0) {
+    box.innerHTML = '<div class="item-row" style="text-align:center;color:#718096">（この項目の問題はCSVに見つかりませんでした）</div>';
+    return;
+  }
+  
+  box.innerHTML = list.map(q => {
+    const ch = (q.choices || []).length ? 
+      `<div class="small">選択肢: <span class="code">${escapeHTML(q.choices.join(' / '))}</span></div>` : '';
+    return `<div class="item-row">
+      <div><span class="code">${escapeHTML(q.id)}</span> <strong>${escapeHTML(q.question || '')}</strong> <span class="badge">${escapeHTML(q.point || '')}</span></div>
+      <div class="small">正解: <span class="code">${escapeHTML(q.answer || '')}</span></div>
+      ${ch}
+      <div class="inline-controls">
+        <button class="inline-btn" onclick="addToReviewById('${q.id}')">復習に追加</button>
+        <button class="inline-btn" onclick="removeFromReviewAndRefresh('${q.id}')">復習から削除</button>
+        <button class="inline-btn" onclick="previewQA('${q.id}')">内容を見る</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addToReviewById(id) {
+  const q = questionData.find(x => String(x.id) === String(id));
+  if(!q) {
+    alert('問題が見つかりません。');
+    return;
+  }
+  addToReview(q);
+  renderReviewList();
+  alert('復習リストに追加しました。');
+}
+
+// カテゴリUI
+function buildCategoryUI() {
+  const major = document.getElementById('majorGroup');
+  if(!major) return;
+  major.innerHTML = '';
+  
+  Object.keys(grammarData).forEach(key => {
+    const label = document.createElement('label');
+    label.style.display = 'flex';
+    label.style.alignItems = 'center';
+    label.style.padding = '4px 0';
+    label.style.cursor = 'pointer';
+    label.style.fontSize = '14px';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = key;
+    checkbox.style.marginRight = '8px';
+    checkbox.addEventListener('change', updateSubCategories);
+    
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(grammarData[key].name));
+    major.appendChild(label);
+  });
+}
+
+function updateSubCategories() {
+  const sub = document.getElementById('subCategoryGroup');
+  if(!sub) return;
+  sub.innerHTML = '';
+  
+  const checkedMajors = [...document.querySelectorAll('#majorGroup input[type=checkbox]:checked')].map(cb => cb.value);
+  const keys = checkedMajors.length ? checkedMajors : Object.keys(grammarData);
+  
+  keys.forEach(key => {
+    const header = document.createElement('div');
+    header.style.fontWeight = '700';
+    header.style.color = '#667eea';
+    header.style.marginTop = '10px';
+    header.style.marginBottom = '4px';
+    header.style.fontSize = '15px';
+    header.textContent = grammarData[key].name;
+    sub.appendChild(header);
+    
+    grammarData[key].items.forEach(item => {
+      const label = document.createElement('label');
+      label.style.display = 'flex';
+      label.style.alignItems = 'center';
+      label.style.padding = '4px 0';
+      label.style.cursor = 'pointer';
+      label.style.fontSize = '14px';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = item.id;
+      checkbox.style.marginRight = '8px';
+      checkbox.addEventListener('change', updateSelectedCategories);
+      
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(`${item.id}. ${item.name}`));
+      sub.appendChild(label);
+    });
+  });
+}
+
+function updateSelectedCategories() {
+  selectedCategories = [...document.querySelectorAll('#subCategoryGroup input[type=checkbox]:checked')].map(cb => (/^\d+$/.test(cb.value) ? cb.value.padStart(3,'0') : cb.value.toUpperCase()));
+}
+
+function selectAllItems() {
+  document.querySelectorAll('#subCategoryGroup input[type=checkbox]').forEach(cb => cb.checked = true);
+  updateSelectedCategories();
+}
+
+function deselectAllItems() {
+  document.querySelectorAll('#subCategoryGroup input[type=checkbox]').forEach(cb => cb.checked = false);
+  updateSelectedCategories();
+}
+
+// テスト開始
+function startTest() {
+  // UIオプション（optConceal）を反映
+  const opt = document.getElementById('optConceal');
+  if (opt) concealTitles = !!opt.checked;
+  if(selectedCategories.length === 0) {
+    alert('文法小項目を1つ以上選択してください');
+    return;
+  }
+  
+  let filtered = questionData.filter(q => { const sid = String(q.subId || '').trim(); const norm = /^\d+$/.test(sid) ? sid.padStart(3,'0') : sid.toUpperCase(); return selectedCategories.includes(norm); });
+  if(filtered.length === 0) {
+    alert('選択した項目に問題がありません');
+    return;
+  }
+  
+  const order = document.getElementById('questionOrder').value;
+  if(order === 'shuffle') filtered = shuffle(filtered);
+  
+  const countSelect = document.getElementById('questionCount').value;
+  let count;
+  
+  if(countSelect === 'custom') {
+    const customValue = document.getElementById('customCount').value;
+    if(!customValue || customValue < 1) {
+      alert('問題数を入力してください（1以上）');
+      return;
+    }
+    count = parseInt(customValue, 10);
+  } else if(countSelect !== 'all') {
+    count = parseInt(countSelect, 10);
+  }
+  
+  if(count) {
+    if(count > filtered.length) {
+      if(!confirm(`選択した項目の問題数は${filtered.length}問です。${filtered.length}問で開始しますか？`)) {
+        return;
+      }
+    }
+    filtered = filtered.slice(0, count);
+  }
+  
+  currentQuestions = filtered.map(q => ({...q}));
+  currentQuestion = 0;
+  reviewAddedNow = 0;
+  correctCount = 0;
+  
+  if(testMode === 'test') {
+    timeLimit = parseInt(document.getElementById('timeLimit').value || '10', 10);
+    startTime = Date.now();
+    if(timeLimit > 0) {
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+    }
+  }
+  
+  showScreen('quizScreen');
+  renderQuestion();
+}
+
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const remaining = timeLimit * 60 - elapsed;
+  if(remaining <= 0) {
+    clearInterval(timerInterval);
+    finishTest();
+    return;
+  }
+  const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+  const ss = String(remaining % 60).padStart(2, '0');
+  document.getElementById('timer').textContent = `残り時間: ${mm}:${ss}`;
+}
+
+// 問題表示
+function renderQuestion() {
+  if(currentQuestion >= currentQuestions.length) {
+    finishTest();
+    return;
+  }
+  
+  const q = currentQuestions[currentQuestion];
+  document.getElementById('questionNumber').textContent = `問${currentQuestion + 1} / ${currentQuestions.length}`;
+  document.getElementById('pointBadge').textContent = concealTitles ? '' : (q.point || '');
+  document.getElementById('questionTitle').textContent = concealTitles ? '' : (q.title || '');
+  document.getElementById('questionText').innerHTML = (q.question || '').split('|').join('<br>');
+  
+  const choiceArea = document.getElementById('choiceArea');
+  choiceArea.innerHTML = '';
+  
+  const choices = q.choices.length === 4 ? q.choices : inferChoicesFromAnswer(q);
+  choices.forEach((c, i) => {
+    const line = document.createElement('div');
+    line.className = 'choice';
+    line.innerHTML = `
+      <input type="radio" name="choice" id="ch${i}" value="${escapeHTML(c)}">
+      <label for="ch${i}" style="display:block;flex:1">${escapeHTML(c)}</label>
+    `;
+    choiceArea.appendChild(line);
+  });
+  
+  // 進捗バー
+  const progress = ((currentQuestion + 1) / currentQuestions.length) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  
+  // リセット
+  document.getElementById('modelAnswer').style.display = 'none';
+  document.getElementById('rateArea').classList.add('hidden');
+  document.getElementById('nextButton').classList.add('hidden');
+  document.getElementById('finishButton').classList.add('hidden');
+  document.getElementById('confirmButton').disabled = false;
+  
+  // ヒント
+  const hintBtn = document.getElementById('hintButton');
+  const hintBox = document.getElementById('hintBox');
+  if(q.hint && q.hint.trim()) {
+    hintBtn.style.display = 'inline-block';
+    document.getElementById('hintText').innerHTML = q.hint.split('|').join('<br>');
+  } else {
+    hintBtn.style.display = 'none';
+  }
+  hintBox.style.display = 'none';
+  
+  // 解説
+  const explBtn = document.getElementById('explanationButton');
+  const explBox = document.getElementById('explanationBox');
+  explBtn.style.display = 'none';
+  explBox.style.display = 'none';
+}
+
+function inferChoicesFromAnswer(q) {
+  const ans = q.answer || '';
+  const pool = ['to tell', 'to saying', 'says', 'telling', 'told', 'to be told', 'to have told', 'tell'];
+  const others = shuffle(pool.filter(x => x !== ans)).slice(0, 3);
+  return shuffle([ans, ...others]);
+}
+
+// 解答確認
+function confirmAnswer() {
+  const radios = document.querySelectorAll('input[name="choice"]');
+  let sel = null;
+  radios.forEach(r => { if(r.checked) sel = r.value; });
+  
+  if(!sel) {
+    alert('選択肢を選んでください');
+    return;
+  }
+  
+  selectedAnswer = sel;
+  const q = currentQuestions[currentQuestion];
+  const correct = normalizeAns(sel) === normalizeAns(q.answer || '');
+  if(correct) correctCount++;
+  
+  // 色付け
+  const lines = [...document.querySelectorAll('.choice')];
+  lines.forEach(line => {
+    const v = line.querySelector('input')?.value || '';
+    if(normalizeAns(v) === normalizeAns(q.answer || '')) line.classList.add('correct');
+    if(normalizeAns(v) === normalizeAns(sel) && !correct) line.classList.add('incorrect');
+  });
+  
+  document.getElementById('modelAnswerText').textContent = q.answer || '';
+  document.getElementById('modelAnswer').style.display = 'block';
+  
+  // 解説ボタンを表示（解説がある場合のみ）
+  const explBtn = document.getElementById('explanationButton');
+  if(q.explanation && q.explanation.trim()) {
+    explBtn.style.display = 'inline-block';
+    document.getElementById('explanationText').innerHTML = q.explanation.split('|').join('<br>');
+  } else {
+    explBtn.style.display = 'none';
+  }
+  
+  document.getElementById('rateArea').classList.remove('hidden');
+  document.getElementById('confirmButton').disabled = true;
+  document.getElementById('nextButton').classList.remove('hidden');
+  
+  if(currentQuestion === currentQuestions.length - 1) {
+    document.getElementById('finishButton').classList.remove('hidden');
+  }
+}
+
+function normalizeAns(s) {
+  return (s || '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// 評価
+function rateCurrent(level) {
+  const q = currentQuestions[currentQuestion];
+  
+  ['btnPerfect', 'btnSome', 'btnNone'].forEach(id => {
+    document.getElementById(id).classList.remove('selected');
+  });
+  
+  document.getElementById(
+    level === 'perfect' ? 'btnPerfect' :
+    level === 'some' ? 'btnSome' : 'btnNone'
+  ).classList.add('selected');
+  
+  const fb = document.getElementById('rateFeedback');
+  if(level === 'some' || level === 'none') {
+    addToReview(q);
+    fb.textContent = '復習リストに追加しました。';
+  } else {
+    fb.textContent = '了解。次へ進めます。';
+  }
+  fb.style.display = 'block';
+}
+
+// 次の問題
+function nextQuestion() {
+  currentQuestion++;
+  renderQuestion();
+}
+
+// 終了
+function finishTest() {
+  if(timerInterval) clearInterval(timerInterval);
+  
+  const total = currentQuestions.length;
+  let elapsed = 0;
+  if(startTime) {
+    elapsed = Math.floor((Date.now() - startTime) / 1000);
+  }
+  const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const ss = String(elapsed % 60).padStart(2, '0');
+  
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('elapsedTime').textContent = `${mm}:${ss}`;
+  document.getElementById('reviewAddedCount').textContent = reviewAddedNow;
+  document.getElementById('scoreDisplay').textContent = `${correctCount} / ${total} 正答`;
+  
+  showScreen('resultScreen');
+}
+
+// ユーティリティ
+function shuffle(arr) {
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function escapeHTML(s) {
+  return (s || '').toString().replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m]));
+}
+
+// イベントリスナー設定
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('Initializing...');
+  
+  // ホーム画面ボタン
+  document.getElementById('btnTestMode').addEventListener('click', () => {
+    showScreen('settingsScreen');
+    selectMode('test');
+    updateSubCategories();
+  });
+  
+  document.getElementById('btnPracticeMode').addEventListener('click', () => {
+    showScreen('settingsScreen');
+    selectMode('practice');
+    updateSubCategories();
+  });
+  
+  document.getElementById('btnReviewMode').addEventListener('click', () => {
+    loadReviewPool();
+    if(!reviewPool.length) {
+      alert('復習リストが空です。「まだ／ぜんぜん」で追加してください。');
+      return;
+    }
+    testMode = 'review';
+    currentQuestions = reviewPool.map(q => ({...q}));
+    currentQuestion = 0;
+    reviewAddedNow = 0;
+    correctCount = 0;
+    document.getElementById('timer').textContent = '';
+    showScreen('quizScreen');
+    renderQuestion();
+  });
+  
+  document.getElementById('btnManagement').addEventListener('click', () => {
+    showManagement();
+  });
+  
+  // 設定画面
+  document.getElementById('modeTest').addEventListener('click', () => selectMode('test'));
+  document.getElementById('modePractice').addEventListener('click', () => selectMode('practice'));
+  
+  // 問題数選択のイベント
+  document.getElementById('questionCount').addEventListener('change', (e) => {
+    const customInput = document.getElementById('customCount');
+    if(e.target.value === 'custom') {
+      customInput.style.display = 'block';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+    }
+  });
+  
+  document.getElementById('btnSelectAllMajor').addEventListener('click', () => {
+    document.querySelectorAll('#majorGroup input[type=checkbox]').forEach(cb => cb.checked = true);
+    updateSubCategories();
+  });
+  document.getElementById('btnDeselectAllMajor').addEventListener('click', () => {
+    document.querySelectorAll('#majorGroup input[type=checkbox]').forEach(cb => cb.checked = false);
+    updateSubCategories();
+  });
+  document.getElementById('btnSelectAllItems').addEventListener('click', selectAllItems);
+  document.getElementById('btnDeselectAllItems').addEventListener('click', deselectAllItems);
+  document.getElementById('btnStartTest').addEventListener('click', startTest);
+  document.getElementById('btnBackFromSettings').addEventListener('click', backToHome);
+  
+  // クイズ画面
+  document.getElementById('hintButton').addEventListener('click', () => {
+    const box = document.getElementById('hintBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+  
+  document.getElementById('explanationButton').addEventListener('click', () => {
+    const box = document.getElementById('explanationBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+  
+  document.getElementById('confirmButton').addEventListener('click', confirmAnswer);
+  document.getElementById('btnPerfect').addEventListener('click', () => rateCurrent('perfect'));
+  document.getElementById('btnSome').addEventListener('click', () => rateCurrent('some'));
+  document.getElementById('btnNone').addEventListener('click', () => rateCurrent('none'));
+  document.getElementById('nextButton').addEventListener('click', nextQuestion);
+  document.getElementById('finishButton').addEventListener('click', finishTest);
+  
+  // 結果画面
+  document.getElementById('btnReviewFromResult').addEventListener('click', () => {
+    loadReviewPool();
+    if(!reviewPool.length) {
+      alert('復習リストが空です。');
+      return;
+    }
+    testMode = 'review';
+    currentQuestions = reviewPool.map(q => ({...q}));
+    currentQuestion = 0;
+    reviewAddedNow = 0;
+    correctCount = 0;
+    showScreen('quizScreen');
+    renderQuestion();
+  });
+  document.getElementById('btnHomeFromResult').addEventListener('click', backToHome);
+  
+  // 管理画面
+  document.getElementById('btnHomeFromMgmt').addEventListener('click', backToHome);
+  
+  // 管理モード機能
+  document.getElementById('btnExportReview').addEventListener('click', exportReviewList);
+  document.getElementById('btnImportReview').addEventListener('click', importReviewList);
+  document.getElementById('btnClearReview').addEventListener('click', clearReviewAll);
+  document.getElementById('itemSelector').addEventListener('change', renderItemQuestions);
+  
+  // FABボタン
+  document.getElementById('homeFab').addEventListener('click', () => {
+    const quizVisible = !document.getElementById('quizScreen').classList.contains('hidden');
+    if(quizVisible && currentQuestions.length) {
+      if(!confirm('進行中のセッションを終了してホームに戻ります。よろしいですか？')) return;
+    }
+    backToHome();
+  });
+  
+  // 初期化
+  buildCategoryUI();
+  updateSubCategories();
+  selectAllItems();
+  loadReviewPool();
+  await autoLoadCSV();
+  
+  console.log('Initialization complete');
+});
+
+// === HOTFIX: POINT092-094 名称修正 ===
+(function(){
+  const FIXES = {'092':'ifの省略','093':'if節を使わない仮定法表現','094':'仮定法を使った慣用表現'};
+  for (const catKey of Object.keys(grammarData)) {
+    const cat = grammarData[catKey];
+    if (!cat || !Array.isArray(cat.items)) continue;
+    cat.items = cat.items.map(it => {
+      const id = String(it.id).padStart(3,'0');
+      if (FIXES[id]) return Object.assign({}, it, { id, name: FIXES[id] });
+      return it;
+    });
+  }
+  if (typeof normalizeTitle==='function' && typeof normalizedTitleMap==='object' && normalizedTitleMap){
+    Object.entries(FIXES).forEach(([id, nm])=>{
+      normalizedTitleMap[ normalizeTitle(nm) ] = id;
+    });
+  }
+})();
+// === END HOTFIX ===
 </script>
 </body>
 </html>
