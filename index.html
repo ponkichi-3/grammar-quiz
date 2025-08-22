@@ -1084,10 +1084,12 @@ function renderQuestion() {
   document.getElementById('questionText').innerHTML = (q.question || '').split('|').join('<br>');
   
   const choiceArea = document.getElementById('choiceArea');
-  choiceArea.innerHTML = '';
-  
-  const choices = q.choices.length === 4 ? q.choices : inferChoicesFromAnswer(q);
-  choices.forEach((c, i) => {
+choiceArea.innerHTML = '';
+
+// 選択肢を毎回シャッフル
+const choicesSource = q.choices.length === 4 ? q.choices : inferChoicesFromAnswer(q);
+const choices = shuffle(choicesSource);
+choices.forEach((c, i) => {
     const line = document.createElement('div');
     line.className = 'choice';
     line.innerHTML = `
