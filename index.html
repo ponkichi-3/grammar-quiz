@@ -288,7 +288,7 @@ let reviewAddedNow=0;
 let selectedAnswer=null;
 let correctCount=0;
 
-const grammarData = {
+let grammarData = {
   tense:{name:"時制（TENSE）",items:[
     {id:"001",name:"基本４時制の定義"},{id:"002",name:"様々な未来表現"},{id:"003",name:"進行形の定義"},
     {id:"004",name:"進行形のルール"},{id:"005",name:"「時や条件」を表す副詞節で用いる現在形"},
@@ -359,6 +359,187 @@ const grammarData = {
     {id:"132",name:"最上級の意味を表す原級・比較表現"}
   ]}
 };
+
+// === PATCH: Inject S01-S21 and override POINT names from Excel ===
+(function() {
+  // Build structure category
+  const structureItems = [
+    {id:'S01', name:'品詞の理解①　名詞'},
+    {id:'S02', name:'品詞の理解②　動詞'},
+    {id:'S03', name:'品詞の理解③　形容詞'},
+    {id:'S04', name:'品詞の理解④　副詞'},
+    {id:'S05', name:'品詞の理解⑤　前置詞'},
+    {id:'S06', name:'第１文型　SV'},
+    {id:'S07', name:'第２文型　SVC'},
+    {id:'S08', name:'第３文型　SVO'},
+    {id:'S09', name:'第４文型　SVOO'},
+    {id:'S10', name:'第５文型　SVOC'},
+    {id:'S11', name:'注意すべき動詞たち'},
+    {id:'S12', name:'Sの決め方'},
+    {id:'S13', name:'動詞の意味は「型」が決める'},
+    {id:'S14', name:'品詞①可算・不可算名詞'},
+    {id:'S15', name:'品詞②冠詞'},
+    {id:'S16', name:'品詞③代名詞・動詞・形容詞・副詞'},
+    {id:'S17', name:'品詞④前置詞・助動詞・接続詞・間投詞・句と節'},
+    {id:'S18', name:'文の種類①肯定文・否定文・人称代名詞'},
+    {id:'S19', name:'文の種類②疑問文'},
+    {id:'S20', name:'文の種類③命令文'},
+    {id:'S21', name:'文の種類④感嘆文・There is構文'}
+  ];
+  // Turn const grammarData into ordered object with structure first
+  const withStructureFirst = Object.assign({ structure: { name: '品詞・文型', items: structureItems } }, grammarData);
+  grammarData = withStructureFirst;
+
+  // Override names for 001-132 from POINT_list.xlsx
+  const NAME_OVERRIDES = {
+  '001':'基本３時制の定義',
+  '002':'様々な未来表現',
+  '003':'進行形の定義',
+  '004':'進行形のルール',
+  '005':'「時や条件」を表す副詞節で用いる現在形',
+  '006':'現在完了形の用法①～完了・結果・経験～',
+  '007':'現在完了形の用法②～継続～',
+  '008':'現在完了形の用法③～注意点～',
+  '009':'過去完了形の用法①～完了・結果・経験～',
+  '010':'過去完了形の用法②～継続～',
+  '011':'過去完了形の用法③～大過去～',
+  '012':'未来完了形の用法①～完了・結果・経験と継続～',
+  '013':'未来完了形の用法②～注意点～',
+  '014':'受動態の基本',
+  '015':'様々な形の受動態',
+  '016':'受動態の疑問文',
+  '017':'第４文型の受動態',
+  '018':'第５文型の受動態',
+  '019':'思考認知告示動詞の受動態',
+  '020':'注意すべき受動態の表現①～be known～',
+  '021':'注意すべき受動態の表現②～感情表現～',
+  '022':'注意すべき受動態の表現③～被害表現～',
+  '023':'注意すべき受動態の表現④～その他の頻出表現～',
+  '024':'be動詞の代わりに使える「動作動詞」と「状態動詞」',
+  '025':'注意すべき受動態の表現⑤～受動態を使わない表現～',
+  '026':'群動詞（熟語）の受動態',
+  '027':'canの基本',
+  '028':'couldを理解しよう',
+  '029':'mayの基本',
+  '030':'mightの基本',
+  '031':'mustの基本',
+  '032':'mustとhave toの違いを理解しよう',
+  '033':'shouldの基本',
+  '034':'shouldの仲間①ought toV',
+  '035':'shouldの仲間②had better V原形',
+  '036':'willの基本',
+  '037':'wouldの基本',
+  '038':'used to V原形～の基本',
+  '039':'shallの基本',
+  '040':'needの基本',
+  '041':'助動詞 have Vp.p.シリーズ',
+  '042':'慣用表現シリーズ',
+  '043':'that節で用いられる想念のshould①',
+  '044':'that節で用いられる想念のshould②',
+  '045':'不定詞の基本① 名詞的用法',
+  '046':'不定詞の基本② 形容詞的用法',
+  '047':'不定詞の基本③ 副詞的用法',
+  '048':'ＳＶＯ＋toＶ～',
+  '049':'不定詞の意味上の主語①',
+  '050':'不定詞の意味上の主語②',
+  '051':'使役動詞（原形不定詞）',
+  '052':'知覚動詞',
+  '053':'～ようだシリーズ',
+  '054':'時制の不一致',
+  '055':'様々な形の不定詞～進行形・受動態・否定～',
+  '056':'疑問詞 toV～シリーズ',
+  '057':'独立不定詞',
+  '058':'be to 不定詞',
+  '059':'難易度を表す形容詞＋ toV～',
+  '060':'代不定詞',
+  '061':'不定詞の熟語①',
+  '062':'不定詞の熟語②',
+  '063':'動名詞の基本',
+  '064':'動名詞と不定詞の違い',
+  '065':'動名詞の意味上の主語と否定語の位置',
+  '066':'動名詞の受動態',
+  '067':'時制の不一致',
+  '068':'動名詞を使った重要表現①',
+  '069':'動名詞を使った重要表現②',
+  '070':'動名詞と不定詞①',
+  '071':'動名詞と不定詞②',
+  '072':'動名詞と不定詞③',
+  '073':'現在分詞の基本',
+  '074':'過去分詞の基本',
+  '075':'補語になる分詞（第２文型）',
+  '076':'補語になる分詞（第５文型）①',
+  '077':'補語になる分詞（第５文型）②',
+  '078':'分詞構文の基本',
+  '079':'分詞構文の作り方',
+  '080':'分詞構文の和訳',
+  '081':'時制の不一致＆独立分詞構文',
+  '082':'接続詞を省略しない分詞構文',
+  '083':'慣用的な分詞構文',
+  '084':'付帯状況を表すwith',
+  '085':'形容詞になっちまった分詞',
+  '086':'直接法と仮定法',
+  '087':'仮定法過去（現在の妄想）',
+  '088':'仮定法過去完了（過去の妄想）',
+  '089':'仮定法ミックス（過去に～だったら、いま…なのになぁ）',
+  '090':'wishとas ifを用いた仮定法',
+  '091':'未来の妄想',
+  '092':'if節を使わない仮定法表現',
+  '093':'仮定法を使った慣用表現',
+  '095':'関係代名詞の基本',
+  '096':'関係代名詞that',
+  '097':'前置詞と関係代名詞',
+  '098':'関係副詞when',
+  '099':'関係副詞whyとhow',
+  '100':'先行詞を省略できるケース',
+  '101':'関係詞の非制限用法',
+  '102':'非制限用法の使い方',
+  '103':'関係副詞where',
+  '104':'関係詞代名詞what',
+  '105':'関係詞代名詞whatを用いた慣用表現',
+  '106':'複合関係詞の概要',
+  '107':'名詞節を作る複合関係代名詞',
+  '108':'副詞節（譲歩）を作る複合関係代名詞①',
+  '109':'副詞節（譲歩）を作る複合関係代名詞②',
+  '110':'関係代名詞としてのas',
+  '111':'関係代名詞としてのthanとbut',
+  '112':'マニア向け関係代名詞',
+  '113':'原級比較の基本',
+  '114':'asの倍数表現',
+  '115':'asを用いた慣用表現①',
+  '116':'asを用いた慣用表現②',
+  '117':'asを用いた慣用表現③',
+  '118':'比較級の基本',
+  '119':'差を具体的に表す比較級',
+  '120':'比較級の倍数表現',
+  '121':'不規則変化する形容詞・副詞',
+  '122':'lessを用いた比較級',
+  '123':'比較級を用いた慣用表現①',
+  '124':'比較級を用いた慣用表現②',
+  '125':'比較級を用いた慣用表現③',
+  '126':'比較級を用いた慣用表現④',
+  '127':'noを使った比較表現①',
+  '128':'noを使った比較表現②',
+  '129':'最上級の基本',
+  '130':'最上級を用いた表現①',
+  '131':'最上級を用いた表現②',
+  '132':'最上級の意味を表す原級・比較表現'
+};
+  for (const catKey of Object.keys(grammarData)) {
+    const cat = grammarData[catKey];
+    if (!cat || !Array.isArray(cat.items)) continue;
+    cat.items = cat.items.map(it => {
+      const id = String(it.id).replace(/^POINT\s*/, '');
+      if (/^\d+$/.test(id)) {
+        const key = id.padStart(3,'0');
+        if (NAME_OVERRIDES[key]) return Object.assign({}, it, { name: NAME_OVERRIDES[key], id: key });
+        return Object.assign({}, it, { id: key });
+      }
+      // Keep S-items as-is
+      return it;
+    });
+  }
+})();
+// === END PATCH ===
 
 // 画面制御
 function showScreen(screenId) {
@@ -497,11 +678,18 @@ function rowsToQuestions(rows) {
     if(!id) continue;
     
     const pointRaw = get(pI).toString();
-    let subId = id.padStart(3, '0');
-    const m = pointRaw.match(/(\d{1,3})/);
-    if(m) {
-      const num = parseInt(m[1], 10);
-      if(num >= 1 && num <= 132) subId = String(num).padStart(3, '0');
+    let subId = id.toString().trim();
+    const mS = pointRaw.match(/S\d{2}/i);
+    if (mS) {
+      subId = mS[0].toUpperCase();
+    } else {
+      const m = pointRaw.match(/(\d{1,3})/);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        if (num >= 1 && num <= 132) subId = String(num).padStart(3, '0');
+      } else {
+        if (/^\d{1,3}$/.test(subId)) subId = subId.padStart(3, '0');
+      }
     }
     
     const choices = [get(c1I), get(c2I), get(c3I), get(c4I)].filter(x => x !== '');
@@ -789,7 +977,7 @@ function updateSubCategories() {
 }
 
 function updateSelectedCategories() {
-  selectedCategories = [...document.querySelectorAll('#subCategoryGroup input[type=checkbox]:checked')].map(cb => cb.value.padStart(3, '0'));
+  selectedCategories = [...document.querySelectorAll('#subCategoryGroup input[type=checkbox]:checked')].map(cb => (/^\d+$/.test(cb.value) ? cb.value.padStart(3,'0') : cb.value.toUpperCase()));
 }
 
 function selectAllItems() {
@@ -809,7 +997,7 @@ function startTest() {
     return;
   }
   
-  let filtered = questionData.filter(q => selectedCategories.includes(String(q.subId).padStart(3, '0')));
+  let filtered = questionData.filter(q => { const sid = String(q.subId || '').trim(); const norm = /^\d+$/.test(sid) ? sid.padStart(3,'0') : sid.toUpperCase(); return selectedCategories.includes(norm); });
   if(filtered.length === 0) {
     alert('選択した項目に問題がありません');
     return;
@@ -1180,6 +1368,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   console.log('Initialization complete');
 });
+
+// === HOTFIX: POINT092-094 名称修正 ===
+(function(){
+  const FIXES = {'092':'ifの省略','093':'if節を使わない仮定法表現','094':'仮定法を使った慣用表現'};
+  for (const catKey of Object.keys(grammarData)) {
+    const cat = grammarData[catKey];
+    if (!cat || !Array.isArray(cat.items)) continue;
+    cat.items = cat.items.map(it => {
+      const id = String(it.id).padStart(3,'0');
+      if (FIXES[id]) return Object.assign({}, it, { id, name: FIXES[id] });
+      return it;
+    });
+  }
+  if (typeof normalizeTitle==='function' && typeof normalizedTitleMap==='object' && normalizedTitleMap){
+    Object.entries(FIXES).forEach(([id, nm])=>{
+      normalizedTitleMap[ normalizeTitle(nm) ] = id;
+    });
+  }
+})();
+// === END HOTFIX ===
 </script>
 </body>
 </html>
