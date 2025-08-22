@@ -1178,6 +1178,15 @@ function confirmAnswer() {
   if(currentQuestion === currentQuestions.length - 1) {
     document.getElementById('finishButton').classList.remove('hidden');
   }
+  // 解答確認後にタイトル/POINTを開示
+  try {
+    if (concealTitles) {
+      const q = currentQuestions[currentQuestion];
+      document.getElementById('pointBadge').textContent = q.point || '';
+      document.getElementById('questionTitle').textContent = q.title || '';
+    }
+  } catch(_) {}
+
 }
 
 function normalizeAns(s) {
@@ -1400,6 +1409,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 })();
 // === END HOTFIX ===
+
+// 解説ボタン押下時も小項目/POINTを必ず表示
+document.addEventListener('DOMContentLoaded', () => {
+  const eb = document.getElementById('explanationButton');
+  if (eb) eb.addEventListener('click', () => {
+    try {
+      const q = currentQuestions[currentQuestion];
+      document.getElementById('explanationBox').style.display = 'block';
+      if (concealTitles) {
+        document.getElementById('pointBadge').textContent = q.point || '';
+        document.getElementById('questionTitle').textContent = q.title || '';
+      }
+    } catch(_) {}
+  });
+});
 </script>
 </body>
 </html>
