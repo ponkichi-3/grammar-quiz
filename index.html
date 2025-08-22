@@ -281,7 +281,7 @@ select:focus,input[type=text]:focus{outline:none;border-color:#667eea}
 </button>
 
 <script>
-const DEFAULT_CSVS = ['grammar_definition_with_examples2.csv','grammar_definition.csv'];
+const DEFAULT_CSVS = ['grammar_mcq.csv','grammar_definition_with_examples2.csv','grammar_definition.csv'];
 document.getElementById('csvNameNote').textContent = DEFAULT_CSVS[0];
 
 // surface errors on screen
@@ -1118,6 +1118,40 @@ function updateSelectedCategories(){selectedCategories=[...document.querySelecto
   }
 })();
 // === END PATCH ===
+
+// 手動でCSVを選択して読み込む
+function pickCSV(){
+  try{
+    const inp = document.createElement('input');
+    inp.type='file'; inp.accept='.csv,text/csv';
+    inp.onchange = (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try{
+          const text = reader.result;
+          const rows = parseCSV(text);
+          questionData = rowsToQuestions(rows);
+          console.log(`[CSV] Loaded ${questionData.length} rows from file picker: ${file.name}`);
+          const note = document.getElementById('csvNameNote');
+          if (note) note.textContent = file.name;
+          try{ buildItemSelector(); }catch(_){}
+          alert('CSVを読み込みました。');
+        }catch(err){
+          console.error(err);
+          alert('CSVの読み込みに失敗しました。');
+        }
+      };
+      reader.readAsText(file, 'UTF-8');
+    };
+    inp.click();
+  }catch(e){
+    console.error(e);
+    alert('CSV選択でエラーが発生しました。');
+  }
+}
+
 </script>
 </body>
 </html>
