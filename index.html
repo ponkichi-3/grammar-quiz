@@ -1196,24 +1196,49 @@ function normalizeAns(s) {
 // 評価
 function rateCurrent(level) {
   const q = currentQuestions[currentQuestion];
-  
   ['btnPerfect', 'btnSome', 'btnNone'].forEach(id => {
-    document.getElementById(id).classList.remove('selected');
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('selected');
   });
-  
-  document.getElementById(
-    level === 'perfect' ? 'btnPerfect' :
-    level === 'some' ? 'btnSome' : 'btnNone'
-  ).classList.add('selected');
-  
+  const currentBtnId = (level === 'perfect') ? 'btnPerfect' : (level === 'some' ? 'btnSome' : 'btnNone');
+  const currentBtn = document.getElementById(currentBtnId);
+  if (currentBtn) currentBtn.classList.add('selected');
+
   const fb = document.getElementById('rateFeedback');
-  if(level === 'some' || level === 'none') {
+
+  if (level === 'some' || level === 'none') {
+    // 未定着→復習に追加
     addToReview(q);
-    fb.textContent = '復習リストに追加しました。';
+    if (fb) {
+      fb.textContent = '復習リストに追加しました。';
+      fb.style.display = 'block';
+    }
   } else {
-    fb.textContent = '了解。次へ進めます。';
+    // 完璧に覚えた→復習から削除（永続）
+    try {
+      removeFromReview(q.id);
+    } catch (_) {}
+
+    // レビューセッション中なら、この問題をセッション配列からも除外
+    if (typeof testMode !== 'undefined' && testMode === 'review') {
+      try {
+        currentQuestions.splice(currentQuestion, 1);
+        // 次の表示タイミングで正しく遷移するようにインデックスを1つ戻す
+        currentQuestion = Math.max(-1, currentQuestion - 1);
+        // もし残りが無くなった場合は「次へ」よりも「終了」を見せる
+        const nextBtn = document.getElementById('nextButton');
+        const finishBtn = document.getElementById('finishButton');
+        if (currentQuestions.length === 0) {
+          if (nextBtn) nextBtn.classList.add('hidden');
+          if (finishBtn) finishBtn.classList.remove('hidden');
+        }
+      } catch (_) {}
+    }
+    if (fb) {
+      fb.textContent = '復習リストから削除しました。';
+      fb.style.display = 'block';
+    }
   }
-  fb.style.display = 'block';
 }
 
 // 次の問題
@@ -1285,6 +1310,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('復習リストが空です。「まだ／ぜんぜん」で追加してください。');
       return;
     }
+    resetState();
+
     testMode = 'review';
     currentQuestions = reviewPool.map(q => ({...q}));
     currentQuestion = 0;
